@@ -1,15 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertTriangle, Download, X } from 'lucide-react';
+import { AlertTriangle, Download, Upload, X } from 'lucide-react';
 import Link from 'next/link';
+import { storage } from '@/modules/transactions/services/storage';
 
 const REMINDER_KEY = 'money_meva_backup_reminder';
 
 export default function BackupReminder() {
   const [visible, setVisible] = useState(false);
+  const [txCount, setTxCount] = useState(0);
 
   useEffect(() => {
+    const count = storage.transactions.getAll().length;
+    setTxCount(count);
+
     const lastDismissed = localStorage.getItem(REMINDER_KEY);
     if (!lastDismissed) {
       setVisible(true);
@@ -27,6 +32,8 @@ export default function BackupReminder() {
   };
 
   if (!visible) return null;
+
+  const isNewUser = txCount < 3;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -72,17 +79,31 @@ export default function BackupReminder() {
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#22c55e18' }}>
-                <Download className="w-4 h-4" style={{ color: '#22c55e' }} />
+            {isNewUser ? (
+              <div className="flex items-start gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--brand)' }}>
+                  <Upload className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Import Your Existing Data</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                    Have data from another device or a previous backup? Import it now so you don&apos;t lose your financial history. Just go to <span className="font-bold" style={{ color: 'var(--brand)' }}>More {'>'} Backup</span> and upload your file.
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Backup Regularly to Stay Safe</p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  Export your data weekly or monthly. Keep backups on your computer, Google Drive, email, or cloud storage. A <span className="font-bold" style={{ color: 'var(--brand)' }}>5-minute backup</span> can save years of financial records.
-                </p>
+            ) : (
+              <div className="flex items-start gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#22c55e18' }}>
+                  <Download className="w-4 h-4" style={{ color: '#22c55e' }} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Backup Regularly to Stay Safe</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                    Export your data weekly or monthly. Keep backups on your computer, Google Drive, email, or cloud storage. A <span className="font-bold" style={{ color: 'var(--brand)' }}>5-minute backup</span> can save years of financial records.
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2 mt-5">
@@ -92,17 +113,25 @@ export default function BackupReminder() {
               className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-xl hover:opacity-90 transition-all"
               style={{ backgroundColor: 'var(--brand)' }}
             >
-              <Download className="w-4 h-4" /> Backup Now
+              {isNewUser ? (
+                <><Upload className="w-4 h-4" /> Import Data</>
+              ) : (
+                <><Download className="w-4 h-4" /> Backup Now</>
+              )}
             </Link>
             <button
               onClick={dismiss}
               className="px-4 py-2.5 text-sm font-medium rounded-xl hover:opacity-80 transition-all border"
               style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
             >
-              Remind Later
+              {isNewUser ? "I'll Do It Later" : 'Remind Later'}
             </button>
           </div>
-          <p className="text-[10px] text-center mt-3" style={{ color: 'var(--text-muted)' }}>Reminder will reappear in 7 days if you choose &quot;Remind Later&quot;</p>
+          <p className="text-[10px] text-center mt-3" style={{ color: 'var(--text-muted)' }}>
+            {isNewUser
+              ? 'This reminder will not appear again after you import or add 3 transactions.'
+              : 'Reminder will reappear in 7 days if you choose &quot;Remind Later&quot;'}
+          </p>
         </div>
       </div>
     </div>
