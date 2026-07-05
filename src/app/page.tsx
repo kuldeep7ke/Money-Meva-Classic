@@ -7,12 +7,13 @@ import { ROLE_LABELS, ROLE_COLORS } from "@/modules/auth/types";
 import { storage } from "@/modules/transactions/services/storage";
 import { loanService } from "@/modules/loans/services/storage";
 import { recurringService } from "@/modules/transactions/services/recurring";
-import { ArrowRightLeft, Users, Settings, Sun, Moon, Wallet, Shield, LogOut, Plus, Home as HomeIcon, Grid3X3, Tag, CreditCard, Archive, FileText, Bell, AlertCircle, Clock, CalendarClock, X, Download, Smartphone } from "lucide-react";
+import { ArrowRightLeft, Users, Settings, Sun, Moon, Wallet, Shield, LogOut, Plus, Home as HomeIcon, Grid3X3, Tag, CreditCard, Archive, FileText, Bell, AlertCircle, Clock, CalendarClock, X, Download, Smartphone, Cloud } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import dynamic from 'next/dynamic';
 
 const DashboardWidgets = dynamic(() => import('@/modules/dashboard/components/DashboardWidgets'), { ssr: false });
 import ReminderFlow from '@/components/ReminderFlow';
+import CloudPromo from '@/components/CloudPromo';
 
 export default function Home() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -60,6 +61,12 @@ export default function Home() {
     if (day === 0 || day === 6) {
       notifs.push({ id: 'weekend-backup', type: 'warning', text: 'Weekend reminder: Backup your data to stay safe', href: '/backup', icon: <Download className="w-5 h-5" /> });
       notifs.push({ id: 'weekend-install', type: 'info', text: 'Install Money Meva on your device for offline access', href: '/install', icon: <Smartphone className="w-5 h-5" /> });
+    }
+
+    const cloudLastNotif = localStorage.getItem('money_meva_cloud_notif');
+    if (!cloudLastNotif || (Date.now() - Number(cloudLastNotif)) > 3 * 24 * 60 * 60 * 1000) {
+      localStorage.setItem('money_meva_cloud_notif', String(Date.now()));
+      notifs.push({ id: 'cloud-promo', type: 'info', text: 'Cloud sync available — back up your data across devices. Contact us to learn more.', href: '/backup', icon: <Cloud className="w-5 h-5" /> });
     }
 
     return notifs;
@@ -168,6 +175,7 @@ export default function Home() {
       </main>
 
       <ReminderFlow />
+      <CloudPromo />
 
       <footer className="max-w-5xl mx-auto px-4 py-4 mt-8" style={{ borderTop: '1px solid var(--border-color)' }}>
         <div className="flex items-center justify-between text-xs" style={{ color: 'var(--text-muted)' }}>

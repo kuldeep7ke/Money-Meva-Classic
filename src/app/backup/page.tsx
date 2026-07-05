@@ -9,7 +9,7 @@ import { categoryService } from '@/modules/categories/services/storage';
 import { loanService } from '@/modules/loans/services/storage';
 import { archiveService } from '@/modules/archive/services/storage';
 import Link from 'next/link';
-import { Download, Upload, Trash2, AlertTriangle, CheckCircle, Database } from 'lucide-react';
+import { Download, Upload, Trash2, AlertTriangle, CheckCircle, Database, Cloud, Mail, Globe, Send } from 'lucide-react';
 import { useConfirm } from '@/components/ConfirmDialog';
 import MathCaptcha from '@/components/MathCaptcha';
 
@@ -199,6 +199,27 @@ export default function BackupPage() {
               <p className="text-2xl font-bold" style={{ color: '#f59e0b' }}>{stats.audit}</p>
               <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Audit Logs</p>
             </div>
+          </div>
+        </div>
+
+        <div className="p-6 rounded-lg border shadow-sm mb-6" style={{ backgroundColor: '#6366f110', borderColor: '#6366f130' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <Cloud className="w-5 h-5" style={{ color: '#6366f1' }} />
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Cloud Sync Available</h2>
+          </div>
+          <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
+            Want your data synced across all devices? Cloud and WordPress versions are now available.
+          </p>
+          <div className="space-y-2">
+            <a href="mailto:info@marathimeva.com" className="flex items-center gap-2 text-sm font-medium hover:opacity-80" style={{ color: '#6366f1' }}>
+              <Mail className="w-4 h-4" /> info@marathimeva.com
+            </a>
+            <a href="https://www.marathimeva.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-medium hover:opacity-80" style={{ color: '#6366f1' }}>
+              <Globe className="w-4 h-4" /> www.marathimeva.com
+            </a>
+            <p className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+              <Send className="w-4 h-4" /> Available on Telegram
+            </p>
           </div>
         </div>
 
