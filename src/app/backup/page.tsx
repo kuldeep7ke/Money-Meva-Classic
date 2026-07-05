@@ -1,22 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { storage } from '@/modules/transactions/services/storage';
+import { useState, useRef } from 'react';
+import { storage, validateBackup, type BackupData, type ImportResults } from '@/modules/transactions/services/storage';
 import { auditService } from '@/modules/transactions/services/audit';
-import { accountService } from '@/modules/accounts/services/storage';
-import { partnerService } from '@/modules/partners/services/storage';
-import { categoryService } from '@/modules/categories/services/storage';
-import { loanService } from '@/modules/loans/services/storage';
-import { archiveService } from '@/modules/archive/services/storage';
+import { APP_VERSION } from '@/constants';
 import Link from 'next/link';
-import { Download, Upload, Trash2, AlertTriangle, CheckCircle, Database, Cloud, Mail, Globe, Send } from 'lucide-react';
+import { Download, Upload, AlertTriangle, CheckCircle, Database, FileJson, Clock, Tag, X } from 'lucide-react';
 import { useConfirm } from '@/components/ConfirmDialog';
-import MathCaptcha from '@/components/MathCaptcha';
+
+type SelectedFile = {
+  name: string;
+  data: BackupData;
+  validation: ReturnType<typeof validateBackup>;
+};
+
+function formatDate(iso: string) {
+  try {
+    return new Date(iso).toLocaleString();
+  } catch {
+    return iso;
+  }
+}
 
 export default function BackupPage() {
-  const [importResult, setImportResult] = useState<{ success: boolean; message: string } | null>(null);
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [importResult, setImportResult] = useState<{ success: boolean; results?: ImportResults; message: string } | null>(null);
+  const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
+  const [importing, setImporting] = useState(false);
+  const mergeInputRef = useRef<HTMLInputElement>(null);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
   const { confirm } = useConfirm();
 
   const handleExport = () => {
@@ -25,125 +36,65 @@ export default function BackupPage() {
     const blob = new Blob([json], { type: 'application/json' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `money_meva_backup_${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `money_meva_backup_${data.version}_${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     auditService.logBackup('Exported', 'user-1', 'default', 'Full backup exported');
   };
 
-  const handleExportTransactions = () => {
-    const transactions = storage.transactions.getAll();
-    const json = JSON.stringify(transactions, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `money_meva_transactions_${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-  };
-
-  const handleExportPartners = () => {
-    const partners = storage.partners.getAll();
-    const json = JSON.stringify(partners, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `money_meva_partners_${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-  };
-
-  const handleExportCategories = () => {
-    const categories = storage.categories.getAll();
-    const json = JSON.stringify(categories, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `money_meva_categories_${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-  };
-
-  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>, mode: 'merge' | 'replace') => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
-        const data = JSON.parse(e.target?.result as string);
+        const raw = JSON.parse(e.target?.result as string);
+        const validation = validateBackup(raw);
 
-        if (data.transactions || data.partners || data.categories) {
-          const ok = await confirm({
-            title: 'Import Backup',
-            message: 'This will merge imported data with existing data. Continue?',
-            confirmText: 'Import',
-            variant: 'warning',
-          });
-          if (ok) {
-            storage.backup.importAll(data);
-            auditService.logBackup('Imported', 'user-1', 'default', `Imported from ${file.name}`);
-            setImportResult({ success: true, message: 'Backup imported successfully!' });
-          }
-        } else {
-          setImportResult({ success: false, message: 'Invalid backup file format' });
+        if (!validation.valid) {
+          setImportResult({ success: false, message: validation.error || 'Invalid backup file' });
+          setSelectedFile(null);
+          return;
         }
+
+        if (!raw.transactions && !raw.partners && !raw.categories && !raw.accounts && !raw.audit) {
+          setImportResult({ success: false, message: 'Backup file contains no recognizable data' });
+          setSelectedFile(null);
+          return;
+        }
+
+        const ok = await confirm({
+          title: mode === 'merge' ? 'Merge Import' : 'Replace All Data',
+          message: mode === 'merge'
+            ? 'New records will be added. Existing records with the same ID will be skipped.'
+            : 'WARNING: This will replace ALL existing data with the backup contents.',
+          confirmText: mode === 'merge' ? 'Merge' : 'Replace',
+          variant: mode === 'merge' ? 'warning' : 'danger',
+        });
+
+        if (!ok) {
+          setSelectedFile(null);
+          return;
+        }
+
+        setImporting(true);
+        const results = storage.backup.importAll(raw, mode);
+        auditService.logBackup(mode === 'merge' ? 'Imported' : 'Replaced', 'user-1', 'default', `${mode} import from ${file.name}`);
+        setImportResult({
+          success: true,
+          results,
+          message: mode === 'merge' ? 'Data merged successfully' : 'Data replaced successfully',
+        });
+        setSelectedFile(null);
       } catch {
         setImportResult({ success: false, message: 'Failed to parse backup file' });
+        setSelectedFile(null);
+      } finally {
+        setImporting(false);
       }
     };
     reader.readAsText(file);
     event.target.value = '';
-  };
-
-  const handleReplaceImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const data = JSON.parse(e.target?.result as string);
-
-        if (data.transactions || data.partners || data.categories) {
-          const ok = await confirm({
-            title: 'Replace All Data',
-            message: 'WARNING: This will REPLACE all existing data. Are you sure?',
-            confirmText: 'Replace',
-            variant: 'danger',
-          });
-          if (ok) {
-            storage.transactions.clear();
-            partnerService.clear();
-            partnerService.groups.clear();
-            categoryService.clear();
-            accountService.clear();
-            loanService.clear();
-            archiveService.clear();
-            auditService.clear();
-            storage.backup.importAll(data);
-            auditService.logBackup('Replaced', 'user-1', 'default', `Data replaced from ${file.name}`);
-            setImportResult({ success: true, message: 'Data replaced successfully!' });
-          }
-        } else {
-          setImportResult({ success: false, message: 'Invalid backup file format' });
-        }
-      } catch {
-        setImportResult({ success: false, message: 'Failed to parse backup file' });
-      }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
-  };
-
-  const handleClearAll = () => {
-    storage.transactions.clear();
-    partnerService.clear();
-    partnerService.groups.clear();
-    categoryService.clear();
-    accountService.clear();
-    loanService.clear();
-    archiveService.clear();
-    auditService.clear();
-    setShowClearConfirm(false);
-    setCaptchaVerified(false);
-    setImportResult({ success: true, message: 'All data cleared!' });
   };
 
   const getDataStats = () => {
@@ -170,10 +121,41 @@ export default function BackupPage() {
         </div>
 
         {importResult && (
-          <div className={`mb-6 p-4 rounded-lg flex items-center gap-3`} style={{ backgroundColor: importResult.success ? '#22c55e22' : '#ef444422', borderColor: importResult.success ? '#22c55e' : '#ef4444', borderWidth: 1 }}>
-            {importResult.success ? <CheckCircle className="w-5 h-5" style={{ color: '#22c55e' }} /> : <AlertTriangle className="w-5 h-5" style={{ color: '#ef4444' }} />}
-            <span style={{ color: 'var(--text-primary)' }}>{importResult.message}</span>
-            <button onClick={() => setImportResult(null)} className="ml-auto" style={{ color: 'var(--text-muted)' }}>✕</button>
+          <div className={`mb-6 p-4 rounded-lg border ${importResult.success ? '' : ''}`} style={{ backgroundColor: importResult.success ? '#22c55e0d' : '#ef44440d', borderColor: importResult.success ? '#22c55e' : '#ef4444' }}>
+            <div className="flex items-start gap-3">
+              {importResult.success ? <CheckCircle className="w-5 h-5 mt-0.5 shrink-0" style={{ color: '#22c55e' }} /> : <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0" style={{ color: '#ef4444' }} />}
+              <div className="flex-1 min-w-0">
+                <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{importResult.message}</p>
+                {importResult.results && (
+                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    {[
+                      { label: 'Transactions', result: importResult.results.transactions },
+                      { label: 'Partners', result: importResult.results.partners },
+                      { label: 'Categories', result: importResult.results.categories },
+                      { label: 'Accounts', result: importResult.results.accounts },
+                      { label: 'Audit Logs', result: importResult.results.audit },
+                    ].map(({ label, result }) => (
+                      result.total > 0 && (
+                        <div key={label} className="text-sm px-3 py-2 rounded" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                          <p style={{ color: 'var(--text-muted)' }}>{label}</p>
+                          <p style={{ color: 'var(--text-primary)' }}>
+                            <span style={{ color: '#22c55e' }}>+{result.imported}</span>
+                            {result.skipped > 0 && <span className="ml-2" style={{ color: '#f59e0b' }}>{result.skipped} skipped</span>}
+                          </p>
+                        </div>
+                      )
+                    ))}
+                    {importResult.results.warning && (
+                      <div className="col-span-full flex items-center gap-2 p-2 rounded" style={{ backgroundColor: '#f59e0b1a' }}>
+                        <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: '#f59e0b' }} />
+                        <span className="text-sm" style={{ color: '#f59e0b' }}>{importResult.results.warning}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <button onClick={() => setImportResult(null)} className="shrink-0" style={{ color: 'var(--text-muted)' }}>✕</button>
+            </div>
           </div>
         )}
 
@@ -202,126 +184,97 @@ export default function BackupPage() {
           </div>
         </div>
 
-        <div className="p-6 rounded-lg border shadow-sm mb-6" style={{ backgroundColor: '#6366f110', borderColor: '#6366f130' }}>
-          <div className="flex items-center gap-2 mb-3">
-            <Cloud className="w-5 h-5" style={{ color: '#6366f1' }} />
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Cloud Sync Available</h2>
-          </div>
-          <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
-            Want your data synced across all devices? Cloud and WordPress versions are now available.
-          </p>
-          <div className="space-y-2">
-            <a href="mailto:info@marathimeva.com" className="flex items-center gap-2 text-sm font-medium hover:opacity-80" style={{ color: '#6366f1' }}>
-              <Mail className="w-4 h-4" /> info@marathimeva.com
-            </a>
-            <a href="https://www.marathimeva.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm font-medium hover:opacity-80" style={{ color: '#6366f1' }}>
-              <Globe className="w-4 h-4" /> www.marathimeva.com
-            </a>
-            <p className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-              <Send className="w-4 h-4" /> Available on Telegram
-            </p>
-          </div>
-        </div>
-
         <div className="p-6 rounded-lg border shadow-sm mb-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
           <div className="flex items-center gap-2 mb-4">
             <Download className="w-5 h-5" style={{ color: 'var(--brand)' }} />
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Export Data</h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Export</h2>
           </div>
-          <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Download your data as JSON files</p>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={handleExport}
-              className="flex items-center justify-center gap-2 px-4 py-3 text-white rounded-lg hover:opacity-90"
-              style={{ backgroundColor: 'var(--brand)' }}
-            >
-              <Download className="w-4 h-4" /> Full Backup
-            </button>
-            <button
-              onClick={handleExportTransactions}
-              className="flex items-center justify-center gap-2 px-4 py-3 border rounded-lg hover:opacity-80"
-              style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
-            >
-              <Download className="w-4 h-4" /> Transactions Only
-            </button>
-            <button
-              onClick={handleExportPartners}
-              className="flex items-center justify-center gap-2 px-4 py-3 border rounded-lg hover:opacity-80"
-              style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
-            >
-              <Download className="w-4 h-4" /> Partners Only
-            </button>
-            <button
-              onClick={handleExportCategories}
-              className="flex items-center justify-center gap-2 px-4 py-3 border rounded-lg hover:opacity-80"
-              style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
-            >
-              <Download className="w-4 h-4" /> Categories Only
-            </button>
-          </div>
+          <p className="mb-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Download a full backup as JSON. The file includes app version and timestamp for compatibility checking.
+          </p>
+          <button
+            onClick={handleExport}
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 text-white rounded-lg hover:opacity-90"
+            style={{ backgroundColor: 'var(--brand)' }}
+          >
+            <Download className="w-4 h-4" /> Download Backup (v{APP_VERSION})
+          </button>
         </div>
 
         <div className="p-6 rounded-lg border shadow-sm mb-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
           <div className="flex items-center gap-2 mb-4">
             <Upload className="w-5 h-5" style={{ color: 'var(--brand)' }} />
-            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Import Data</h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Import</h2>
           </div>
-          <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Restore data from a backup file</p>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="flex items-center justify-center gap-2 px-4 py-3 text-white rounded-lg hover:opacity-90 cursor-pointer" style={{ backgroundColor: '#22c55e' }}>
+          <p className="mb-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Restore data from a backup file. Duplicate entries (same ID) are automatically skipped during import.
+          </p>
+
+          {selectedFile && (
+            <div className="mb-4 p-4 rounded-lg border" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <FileJson className="w-5 h-5" style={{ color: 'var(--brand)' }} />
+                  <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{selectedFile.name}</span>
+                </div>
+                <button onClick={() => setSelectedFile(null)} style={{ color: 'var(--text-muted)' }}><X className="w-4 h-4" /></button>
+              </div>
+              <div className="space-y-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <div className="flex items-center gap-2">
+                  <Tag className="w-3.5 h-3.5" />
+                  <span>Backup version: <strong style={{ color: 'var(--text-primary)' }}>v{selectedFile.data.version}</strong></span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Exported: <strong style={{ color: 'var(--text-primary)' }}>{formatDate(selectedFile.data.exportedAt)}</strong></span>
+                </div>
+                {selectedFile.validation.warning && (
+                  <div className="flex items-center gap-2 mt-2 p-2 rounded" style={{ backgroundColor: '#f59e0b1a' }}>
+                    <AlertTriangle className="w-4 h-4 shrink-0" style={{ color: '#f59e0b' }} />
+                    <span style={{ color: '#f59e0b' }}>{selectedFile.validation.warning}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {importing && (
+            <div className="mb-4 p-3 rounded-lg flex items-center gap-3" style={{ backgroundColor: '#6366f110' }}>
+              <div className="w-4 h-4 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--brand)', borderTopColor: 'transparent' }} />
+              <span style={{ color: 'var(--text-secondary)' }}>Importing data...</span>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <label className="flex items-center justify-center gap-2 px-6 py-3 text-white rounded-lg hover:opacity-90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: '#22c55e' }}>
               <Upload className="w-4 h-4" /> Merge Import
-              <input type="file" accept=".json" onChange={handleImport} className="hidden" />
+              <input ref={mergeInputRef} type="file" accept=".json" onChange={(e) => handleFileSelect(e, 'merge')} className="hidden" disabled={importing} />
             </label>
-            <label className="flex items-center justify-center gap-2 px-4 py-3 text-white rounded-lg hover:opacity-90 cursor-pointer" style={{ backgroundColor: '#f59e0b' }}>
+            <label className="flex items-center justify-center gap-2 px-6 py-3 text-white rounded-lg hover:opacity-90 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" style={{ backgroundColor: '#f59e0b' }}>
               <Upload className="w-4 h-4" /> Replace Import
-              <input type="file" accept=".json" onChange={handleReplaceImport} className="hidden" />
+              <input ref={replaceInputRef} type="file" accept=".json" onChange={(e) => handleFileSelect(e, 'replace')} className="hidden" disabled={importing} />
             </label>
           </div>
+          <p className="mt-3 text-xs" style={{ color: 'var(--text-muted)' }}>
+            Merge adds new records and skips duplicates. Replace clears all existing data first.
+          </p>
         </div>
 
         <div className="p-6 rounded-lg border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: '#ef4444' }}>
           <div className="flex items-center gap-2 mb-4">
-            <Trash2 className="w-5 h-5" style={{ color: '#ef4444' }} />
+            <AlertTriangle className="w-5 h-5" style={{ color: '#ef4444' }} />
             <h2 className="text-lg font-semibold" style={{ color: '#ef4444' }}>Danger Zone</h2>
           </div>
-          <p className="mb-4" style={{ color: 'var(--text-secondary)' }}>Permanently delete ALL data including transactions, partners, categories, audit logs, settings, and archived items. This cannot be undone.</p>
-
-          {!showClearConfirm ? (
-            <button
-              onClick={() => setShowClearConfirm(true)}
-              className="px-4 py-2 border rounded-lg hover:opacity-80"
-              style={{ borderColor: '#ef4444', color: '#ef4444' }}
-            >
-              Clear All Data
-            </button>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 p-3 rounded-lg" style={{ backgroundColor: '#ef444422' }}>
-                <AlertTriangle className="w-5 h-5" style={{ color: '#ef4444' }} />
-                <span style={{ color: '#ef4444' }}>This will permanently delete everything. Export a backup first if needed.</span>
-              </div>
-
-              <MathCaptcha onVerify={setCaptchaVerified} />
-
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleClearAll}
-                  disabled={!captchaVerified}
-                  className="px-4 py-2 text-white rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ backgroundColor: '#ef4444' }}
-                >
-                  Yes, Delete All Data
-                </button>
-                <button
-                  onClick={() => { setShowClearConfirm(false); setCaptchaVerified(false); }}
-                  className="px-4 py-2 border rounded-lg hover:opacity-80"
-                  style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
+          <p className="mb-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Permanently delete ALL data. This cannot be undone — export a backup first.
+          </p>
+          <Link
+            href="/danger"
+            className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80 text-sm"
+            style={{ borderColor: '#ef4444', color: '#ef4444' }}
+          >
+            <AlertTriangle className="w-4 h-4" /> Go to Danger Zone
+          </Link>
         </div>
       </div>
     </div>
