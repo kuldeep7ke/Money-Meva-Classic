@@ -72,17 +72,15 @@ export const storage = {
   },
 
   backup: {
-    exportAll: async () => {
-      return {
-        transactions: idbStorage.getAll<Transaction>('transactions'),
-        partners: idbStorage.getAll<Partner>('partners'),
-        categories: idbStorage.getAll<Category>('categories'),
-        accounts: idbStorage.getAll<Account>('accounts'),
-        audit: idbStorage.getAll<AuditLog>('audit'),
-        version: '1.1.0',
-        exportedAt: new Date().toISOString(),
-      };
-    },
+    exportAll: () => ({
+      transactions: idbStorage.getAll<Transaction>('transactions'),
+      partners: idbStorage.getAll<Partner>('partners'),
+      categories: idbStorage.getAll<Category>('categories'),
+      accounts: idbStorage.getAll<Account>('accounts'),
+      audit: idbStorage.getAll<AuditLog>('audit'),
+      version: '1.1.0',
+      exportedAt: new Date().toISOString(),
+    }),
     importAll: (data: {
       transactions?: Transaction[];
       partners?: Partner[];
@@ -90,11 +88,18 @@ export const storage = {
       accounts?: Account[];
       audit?: AuditLog[];
     }) => {
-      if (data.transactions) idbStorage.set('transactions', 'transactions', data.transactions);
-      if (data.partners) idbStorage.set('partners', 'partners', data.partners);
-      if (data.categories) idbStorage.set('categories', 'categories', data.categories);
-      if (data.accounts) idbStorage.set('accounts', 'accounts', data.accounts);
-      if (data.audit) idbStorage.set('audit', 'audit', data.audit);
+      const mergeArray = <T extends { id: string }>(existing: T[], incoming?: T[]): T[] => {
+        if (!incoming || incoming.length === 0) return existing;
+        const map = new Map<string, T>();
+        existing.forEach(i => map.set(i.id, i));
+        incoming.forEach(i => { if (i) map.set(i.id, i); });
+        return Array.from(map.values());
+      };
+      idbStorage.set('transactions', 'transactions', mergeArray(idbStorage.getAll<Transaction>('transactions'), data.transactions));
+      idbStorage.set('partners', 'partners', mergeArray(idbStorage.getAll<Partner>('partners'), data.partners));
+      idbStorage.set('categories', 'categories', mergeArray(idbStorage.getAll<Category>('categories'), data.categories));
+      idbStorage.set('accounts', 'accounts', mergeArray(idbStorage.getAll<Account>('accounts'), data.accounts));
+      idbStorage.set('audit', 'audit', mergeArray(idbStorage.getAll<AuditLog>('audit'), data.audit));
     },
   },
 };
