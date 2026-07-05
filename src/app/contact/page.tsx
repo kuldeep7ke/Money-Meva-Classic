@@ -20,15 +20,15 @@ export default function ContactPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { icon: <Mail className="w-5 h-5 text-white" />, title: 'Email', value: 'info@marathimeva.com', color: '#22c55e' },
-              { icon: <Globe className="w-5 h-5 text-white" />, title: 'Website', value: 'www.marathimeva.com', color: '#3b82f6' },
-              { icon: <MapPin className="w-5 h-5 text-white" />, title: 'Location', value: 'Mumbai, India', color: '#f59e0b' },
+              { icon: <Mail className="w-5 h-5 text-white" />, title: 'Email', value: 'info@marathimeva.com', color: '#22c55e', href: 'mailto:info@marathimeva.com' },
+              { icon: <Globe className="w-5 h-5 text-white" />, title: 'Website', value: 'www.marathimeva.com', color: '#3b82f6', href: 'https://www.marathimeva.com' },
+              { icon: <MapPin className="w-5 h-5 text-white" />, title: 'Location', value: 'Mumbai, India', color: '#f59e0b', href: 'https://maps.google.com/?q=Mumbai,India' },
             ].map((c, i) => (
-              <div key={i} className="p-5 rounded-lg border text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+              <a key={i} href={c.href} target={c.href.startsWith('mailto:') ? undefined : '_blank'} rel={c.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'} className="block p-5 rounded-lg border text-center hover:opacity-85 transition-all" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', cursor: 'pointer' }}>
                 <div className="w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-3" style={{ backgroundColor: c.color }}>{c.icon}</div>
                 <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>{c.title}</p>
                 <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>{c.value}</p>
-              </div>
+              </a>
             ))}
           </div>
 
