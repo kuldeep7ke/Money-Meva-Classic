@@ -14,7 +14,7 @@ import { authService } from '@/modules/auth/services/storage';
 import { ROLE_LABELS, ROLE_COLORS } from '@/modules/auth/types';
 import { formatCurrency } from '@/utils';
 import {
-      Tag, BarChart3, CreditCard, Shield, Archive, FileText, Database,
+      Tag, BarChart3, CreditCard, Shield, Archive, FileText, Database, Download,
       ArrowLeft, ChevronRight, TrendingUp, TrendingDown, Users, Wallet,
       PieChart, Activity, Clock, AlertTriangle, User as UserIcon
 } from 'lucide-react';
@@ -92,6 +92,7 @@ export default function MorePage() {
     { href: '/reports', icon: <BarChart3 className="w-5 h-5" />, label: 'Reports', desc: 'Financial insights & analytics', color: '#06b6d4' },
     ...(hasPermission('users.read') ? [{ href: '/users', icon: <Shield className="w-5 h-5" />, label: 'Users', desc: 'Manage user accounts & roles', color: '#ef4444', count: users.length }] : []),
     { href: '/backup', icon: <Database className="w-5 h-5" />, label: 'Backup', desc: 'Export & import your data', color: '#6366f1' },
+    { href: '/install', icon: <Download className="w-5 h-5" />, label: 'Install App', desc: 'Add to your device for offline access', color: '#22c55e' },
   ];
 
   return (
