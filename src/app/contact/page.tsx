@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Home, Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { Home, Mail, Globe, MapPin, Send, CheckCircle } from 'lucide-react';
 
 export default function ContactPage() {
   const [formName, setFormName] = useState('');
@@ -37,8 +37,8 @@ export default function ContactPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { icon: <Mail className="w-5 h-5 text-white" />, title: 'Email', value: 'support@moneymeva.com', color: '#22c55e' },
-              { icon: <Phone className="w-5 h-5 text-white" />, title: 'Phone', value: '+91 98765 43210', color: '#3b82f6' },
+              { icon: <Mail className="w-5 h-5 text-white" />, title: 'Email', value: 'info@marathimeva.com', color: '#22c55e' },
+              { icon: <Globe className="w-5 h-5 text-white" />, title: 'Website', value: 'www.marathimeva.com', color: '#3b82f6' },
               { icon: <MapPin className="w-5 h-5 text-white" />, title: 'Location', value: 'Mumbai, India', color: '#f59e0b' },
             ].map((c, i) => (
               <div key={i} className="p-5 rounded-lg border text-center" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
