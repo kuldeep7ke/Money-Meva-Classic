@@ -1,11 +1,11 @@
 {
-  "name": "Money Meva Classic",
-  "short_name": "Money Meva",
-  "description": "Personal Finance Management Application",
+  "name": "Money Meva",
+  "short_name": "MoneyMeva",
+  "description": "Personal finance management app",
   "start_url": "/login",
   "display": "standalone",
-  "background_color": "#1B1B1D",
-  "theme_color": "#FF8A3D",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
   "icons": [
     {
       "src": "/icon.svg",

@@ -54,7 +54,7 @@ export default function ReportsCharts({ reportType, dailyData, categoryData, par
           <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Category Distribution</h3>
           {categoryData.length === 0 ? <p className="text-center py-8" style={{ color: 'var(--text-muted)' }}>No data</p> : (
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart><Pie data={categoryData} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`} outerRadius={100} fill="#8884d8" dataKey="value">{categoryData.map((_: any, index: number) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}</Pie><Tooltip contentStyle={tooltipStyle} /></PieChart>
+              <PieChart><Pie data={categoryData} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name} (${((percent || 0) * 100).toFixed(0)}%)`} outerRadius={100} fill="#8884d8" dataKey="value">{categoryData.map((_: any, index: number) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}</Pie><Tooltip contentStyle={tooltipStyle} /></PieChart>
             </ResponsiveContainer>
           )}
         </div>
@@ -95,7 +95,7 @@ export default function ReportsCharts({ reportType, dailyData, categoryData, par
           <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Transaction Types</h3>
           {typeData.length === 0 ? <p className="text-center py-8" style={{ color: 'var(--text-muted)' }}>No data</p> : (
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart><Pie data={typeData} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`} outerRadius={100} fill="#8884d8" dataKey="value">{typeData.map((entry: any, index: number) => <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />)}</Pie><Tooltip contentStyle={tooltipStyle} /></PieChart>
+              <PieChart><Pie data={typeData} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name} (${((percent || 0) * 100).toFixed(0)}%)`} outerRadius={100} fill="#8884d8" dataKey="value">{typeData.map((entry: any, index: number) => <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />)}</Pie><Tooltip contentStyle={tooltipStyle} /></PieChart>
             </ResponsiveContainer>
           )}
         </div>

@@ -1,74 +1,72 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
-interface ThemeContextType {
+interface ThemeContextValue {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
+  setTheme: (t: Theme) => void;
+  toggle: () => void;
   resolvedTheme: 'light' | 'dark';
 }
 
-const ThemeContext = createContext<ThemeContextType>({
+const ThemeContext = createContext<ThemeContextValue>({
   theme: 'light',
   setTheme: () => {},
+  toggle: () => {},
   resolvedTheme: 'light',
 });
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+export function useTheme() { return useContext(ThemeContext); }
+
+function getSystemTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'light';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('light');
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem('money_meva_theme') as Theme | null;
-    if (saved) {
-      setThemeState(saved);
-    }
+  useEffect(() => { setMounted(true); }, []);
+
+  const apply = useCallback((t: Theme) => {
+    const resolved = t === 'system' ? getSystemTheme() : t;
+    setResolvedTheme(resolved);
+    document.documentElement.classList.toggle('dark', resolved === 'dark');
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
+    const stored = (localStorage.getItem('mm_theme') as Theme) || 'light';
+    setThemeState(stored);
+    apply(stored);
+  }, [mounted, apply]);
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const resolveTheme = () => {
-      let resolved: 'light' | 'dark';
-      if (theme === 'system') {
-        resolved = mediaQuery.matches ? 'dark' : 'light';
-      } else {
-        resolved = theme;
-      }
-      setResolvedTheme(resolved);
-      
-      if (resolved === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    };
+  useEffect(() => {
+    if (theme !== 'system') return;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = () => apply('system');
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, [theme, apply]);
 
-    resolveTheme();
-    mediaQuery.addEventListener('change', resolveTheme);
-    
-    return () => mediaQuery.removeEventListener('change', resolveTheme);
-  }, [theme, mounted]);
+  const setTheme = useCallback((t: Theme) => {
+    setThemeState(t);
+    localStorage.setItem('mm_theme', t);
+    apply(t);
+  }, [apply]);
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem('money_meva_theme', newTheme);
-  };
+  const toggle = useCallback(() => {
+    const next = resolvedTheme === 'light' ? 'dark' : 'light';
+    setTheme(next);
+  }, [resolvedTheme, setTheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
-      {children}
+    <ThemeContext.Provider value={{ theme, setTheme, toggle, resolvedTheme }}>
+      {mounted ? children : null}
     </ThemeContext.Provider>
   );
-}
-
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  return context;
 }
