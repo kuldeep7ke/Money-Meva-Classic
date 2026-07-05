@@ -46,7 +46,7 @@ export default function AboutPage() {
               {[
                 { label: 'Version', value: `v${APP_VERSION}` },
                 { label: 'License', value: 'Proprietary' },
-                { label: 'Framework', value: 'Next.js 14 + TypeScript' },
+                { label: 'Framework', value: 'Next.js 16 + TypeScript' },
                 { label: 'Styling', value: 'Tailwind CSS' },
                 { label: 'Storage', value: 'IndexedDB (Dexie.js)' },
                 { label: 'Charts', value: 'Recharts' },

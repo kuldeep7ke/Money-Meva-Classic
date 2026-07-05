@@ -95,7 +95,7 @@ export default function TermsPage() {
             <h2 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>8. Contact</h2>
             <p style={{ color: 'var(--text-secondary)' }}>
               For questions about these Terms & Conditions, contact us at{' '}
-              <span className="font-medium" style={{ color: 'var(--brand)' }}>support@moneymeva.com</span>
+              <span className="font-medium" style={{ color: 'var(--brand)' }}>info@marathimeva.com</span>
             </p>
           </div>
 

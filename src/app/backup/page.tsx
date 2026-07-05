@@ -5,7 +5,7 @@ import { storage, validateBackup, type BackupData, type ImportResults } from '@/
 import { auditService } from '@/modules/transactions/services/audit';
 import { APP_VERSION } from '@/constants';
 import Link from 'next/link';
-import { Download, Upload, AlertTriangle, CheckCircle, Database, FileJson, Clock, Tag, X } from 'lucide-react';
+import { Download, Upload, AlertTriangle, CheckCircle, Database, FileJson, Clock, Tag, X, Cloud, Globe, Send, ExternalLink } from 'lucide-react';
 import { useConfirm } from '@/components/ConfirmDialog';
 
 type SelectedFile = {
@@ -260,21 +260,45 @@ export default function BackupPage() {
           </p>
         </div>
 
-        <div className="p-6 rounded-lg border shadow-sm" style={{ backgroundColor: 'var(--bg-card)', borderColor: '#ef4444' }}>
+        <div className="p-6 rounded-lg border shadow-sm mb-6" style={{ backgroundColor: '#6366f108', borderColor: '#6366f120' }}>
           <div className="flex items-center gap-2 mb-4">
-            <AlertTriangle className="w-5 h-5" style={{ color: '#ef4444' }} />
-            <h2 className="text-lg font-semibold" style={{ color: '#ef4444' }}>Danger Zone</h2>
+            <Cloud className="w-5 h-5" style={{ color: '#6366f1' }} />
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Cloud Version Available</h2>
           </div>
-          <p className="mb-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Permanently delete ALL data. This cannot be undone — export a backup first.
+          <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+            Want sync across all devices, WordPress self-hosting, or real-time collaboration? We have paid plans for every need.
           </p>
-          <Link
-            href="/danger"
-            className="inline-flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80 text-sm"
-            style={{ borderColor: '#ef4444', color: '#ef4444' }}
-          >
-            <AlertTriangle className="w-4 h-4" /> Go to Danger Zone
-          </Link>
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <Database className="w-4 h-4 shrink-0" style={{ color: '#6366f1' }} />
+              <div>
+                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Supabase Cloud</p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Real-time sync across devices</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <Globe className="w-4 h-4 shrink-0" style={{ color: '#f59e0b' }} />
+              <div>
+                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>WordPress Plugin</p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Self-host on your own server</p>
+              </div>
+            </div>
+            <a href="https://t.me/marathimeva" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <Send className="w-4 h-4 shrink-0" style={{ color: '#22c55e' }} />
+              <div>
+                <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Available on Telegram</p>
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>t.me/marathimeva</p>
+              </div>
+            </a>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a href="mailto:info@marathimeva.com" className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white rounded-lg hover:opacity-90" style={{ backgroundColor: '#6366f1' }}>
+              <ExternalLink className="w-4 h-4" /> Contact Us
+            </a>
+            <a href="https://www.marathimeva.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg border hover:opacity-80" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}>
+              <Globe className="w-4 h-4" /> www.marathimeva.com
+            </a>
+          </div>
         </div>
       </div>
     </div>

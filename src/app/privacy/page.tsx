@@ -94,7 +94,7 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>8. Contact Us</h2>
             <p style={{ color: 'var(--text-secondary)' }}>
               If you have questions about this Privacy Policy, please contact us at{' '}
-              <span className="font-medium" style={{ color: 'var(--brand)' }}>support@moneymeva.com</span>
+              <span className="font-medium" style={{ color: 'var(--brand)' }}>info@marathimeva.com</span>
             </p>
           </div>
 

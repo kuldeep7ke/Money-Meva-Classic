@@ -67,15 +67,15 @@ export default function CloudPromo() {
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+            <a href="https://t.me/marathimeva" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-lg hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#22c55e18' }}>
                 <Send className="w-4 h-4" style={{ color: '#22c55e' }} />
               </div>
               <div>
                 <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Available on Telegram</p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Get updates, support, and cloud plan inquiries directly via Telegram.</p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>t.me/marathimeva</p>
               </div>
-            </div>
+            </a>
           </div>
 
           <div className="mt-5 space-y-3">

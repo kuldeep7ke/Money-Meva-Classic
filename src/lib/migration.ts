@@ -1,4 +1,4 @@
-import { db } from '@/lib/db';
+import { db, TransactionRecord, PartnerRecord, PartnerGroupRecord, CategoryRecord, UserRecord, AccountRecord, LoanRecord, AuditRecord, ArchiveRecord } from '@/lib/db';
 import { STORAGE_KEYS } from '@/constants';
 
 function getStorageItem<T>(key: string): T[] {
@@ -32,55 +32,55 @@ export const migrationService = {
     const counts: Record<string, number> = {};
 
     try {
-      const transactions = getStorageItem<any>(STORAGE_KEYS.TRANSACTIONS);
+      const transactions = getStorageItem<TransactionRecord>(STORAGE_KEYS.TRANSACTIONS);
       if (transactions.length > 0) {
         await db.transactions.bulkPut(transactions);
         counts.transactions = transactions.length;
       }
 
-      const partners = getStorageItem<any>(STORAGE_KEYS.PARTNERS);
+      const partners = getStorageItem<PartnerRecord>(STORAGE_KEYS.PARTNERS);
       if (partners.length > 0) {
         await db.partners.bulkPut(partners);
         counts.partners = partners.length;
       }
 
-      const partnerGroups = getStorageItem<any>('money_meva_partner_groups');
+      const partnerGroups = getStorageItem<PartnerGroupRecord>('money_meva_partner_groups');
       if (partnerGroups.length > 0) {
         await db.partnerGroups.bulkPut(partnerGroups);
         counts.partnerGroups = partnerGroups.length;
       }
 
-      const categories = getStorageItem<any>(STORAGE_KEYS.CATEGORIES);
+      const categories = getStorageItem<CategoryRecord>(STORAGE_KEYS.CATEGORIES);
       if (categories.length > 0) {
         await db.categories.bulkPut(categories);
         counts.categories = categories.length;
       }
 
-      const users = getStorageItem<any>(STORAGE_KEYS.USERS);
+      const users = getStorageItem<UserRecord>(STORAGE_KEYS.USERS);
       if (users.length > 0) {
         await db.users.bulkPut(users);
         counts.users = users.length;
       }
 
-      const accounts = getStorageItem<any>(STORAGE_KEYS.ACCOUNTS);
+      const accounts = getStorageItem<AccountRecord>(STORAGE_KEYS.ACCOUNTS);
       if (accounts.length > 0) {
         await db.accounts.bulkPut(accounts);
         counts.accounts = accounts.length;
       }
 
-      const loans = getStorageItem<any>('money_meva_loans');
+      const loans = getStorageItem<LoanRecord>('money_meva_loans');
       if (loans.length > 0) {
         await db.loans.bulkPut(loans);
         counts.loans = loans.length;
       }
 
-      const audit = getStorageItem<any>(STORAGE_KEYS.AUDIT);
+      const audit = getStorageItem<AuditRecord>(STORAGE_KEYS.AUDIT);
       if (audit.length > 0) {
         await db.audit.bulkPut(audit);
         counts.audit = audit.length;
       }
 
-      const archive = getStorageItem<any>('money_meva_archive');
+      const archive = getStorageItem<ArchiveRecord>('money_meva_archive');
       if (archive.length > 0) {
         await db.archive.bulkPut(archive);
         counts.archive = archive.length;

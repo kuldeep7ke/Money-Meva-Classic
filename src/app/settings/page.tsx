@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '@/components/ThemeProvider';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Settings as SettingsIcon, Moon, Sun, Globe, Clock, Shield, Save, Monitor, Users, AlertTriangle } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Globe, Clock, Shield, Save, Monitor, Users, AlertTriangle, Crown } from 'lucide-react';
 import { useConfirm } from '@/components/ConfirmDialog';
 import { usePinGuard } from '@/components/PinGuard';
 
@@ -88,19 +88,6 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleReset = async () => {
-    const ok = await confirm({
-      title: 'Reset Settings',
-      message: 'Reset all settings to default?',
-      confirmText: 'Reset',
-      variant: 'warning',
-    });
-    if (ok) {
-      setSettings(DEFAULT_SETTINGS);
-      localStorage.setItem('money_meva_settings', JSON.stringify(DEFAULT_SETTINGS));
-    }
-  };
-
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
       <div className="max-w-3xl mx-auto px-4 py-8">
@@ -122,14 +109,17 @@ export default function SettingsPage() {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Business Name</label>
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
+                  Business Name <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: '#f59e0b20', color: '#f59e0b' }}><Crown className="w-3 h-3" /> Pro</span>
+                </label>
                 <input
                   type="text"
-                  value={settings.businessName}
-                  onChange={(e) => setSettings({ ...settings, businessName: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                  value="Available on Pro Version"
+                  readOnly
+                  className="w-full px-3 py-2 border rounded-lg opacity-60 cursor-not-allowed"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
                 />
+                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Upgrade to Pro to customize your business name.</p>
               </div>
             </div>
           </div>
@@ -279,14 +269,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="flex justify-between">
-            <button
-              onClick={handleReset}
-              className="px-4 py-2 border rounded-lg hover:opacity-80"
-              style={{ borderColor: 'var(--brand)', color: 'var(--brand)' }}
-            >
-              Reset to Default
-            </button>
+          <div className="flex justify-end">
             <button
               onClick={handleSave}
               className="flex items-center gap-2 px-6 py-2 text-white rounded-lg hover:opacity-90"
