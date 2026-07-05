@@ -1,6 +1,6 @@
 # Money Meva Classic
 
-A shared finance management application built with Next.js 14. Offline-first, with IndexedDB storage, dark mode, double-entry accounting, role-based access, and comprehensive financial tracking.
+A personal finance management application built with Next.js 14. Offline-first, with IndexedDB storage, dark mode, double-entry accounting, role-based access, and comprehensive financial tracking.
 
 ## Features
 

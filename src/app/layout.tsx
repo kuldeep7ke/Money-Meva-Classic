@@ -10,7 +10,7 @@ import IDBInitializer from "@/components/IDBInitializer";
 
 export const metadata: Metadata = {
   title: "Money Meva",
-  description: "Shared Finance Management Application",
+  description: "Personal Finance Management Application",
 };
 
 function AppWrapper({ children }: { children: React.ReactNode }) {

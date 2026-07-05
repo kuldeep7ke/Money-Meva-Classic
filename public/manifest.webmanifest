@@ -1,7 +1,7 @@
 {
   "name": "Money Meva Classic",
   "short_name": "Money Meva",
-  "description": "Shared Finance Management Application",
+  "description": "Personal Finance Management Application",
   "start_url": "/login",
   "display": "standalone",
   "background_color": "#1B1B1D",

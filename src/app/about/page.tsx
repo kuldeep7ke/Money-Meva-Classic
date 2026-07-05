@@ -11,7 +11,7 @@ export default function AboutPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>About Money Meva</h1>
-            <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>Shared Finance Management Application</p>
+            <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>Personal Finance Management Application</p>
           </div>
           <Link href="/" className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
             <Home className="w-5 h-5" /> Home
@@ -30,7 +30,7 @@ export default function AboutPage() {
               </div>
             </div>
             <p style={{ color: 'var(--text-secondary)' }}>
-              Money Meva is a comprehensive shared finance management application designed for individuals,
+              Money Meva is a comprehensive personal finance management application designed for individuals,
               families, and small businesses. Track transactions with double-entry accounting, manage partners,
               monitor loans and investments, and gain insights into your financial health — all offline-first
               with automatic IndexedDB storage.
