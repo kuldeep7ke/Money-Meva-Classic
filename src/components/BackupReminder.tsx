@@ -7,11 +7,12 @@ import { storage } from '@/modules/transactions/services/storage';
 
 const REMINDER_KEY = 'money_meva_backup_reminder';
 
-export default function BackupReminder() {
-  const [visible, setVisible] = useState(false);
+export default function BackupReminder({ onDismiss, force }: { onDismiss?: () => void; force?: boolean }) {
+  const [visible, setVisible] = useState(!!force);
   const [txCount, setTxCount] = useState(0);
 
   useEffect(() => {
+    if (force) return;
     const count = storage.transactions.getAll().length;
     setTxCount(count);
 
@@ -24,11 +25,12 @@ export default function BackupReminder() {
     if (daysSinceDismiss >= 7) {
       setVisible(true);
     }
-  }, []);
+  }, [force]);
 
   const dismiss = () => {
     localStorage.setItem(REMINDER_KEY, String(Date.now()));
     setVisible(false);
+    onDismiss?.();
   };
 
   if (!visible) return null;

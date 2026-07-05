@@ -7,12 +7,12 @@ import { ROLE_LABELS, ROLE_COLORS } from "@/modules/auth/types";
 import { storage } from "@/modules/transactions/services/storage";
 import { loanService } from "@/modules/loans/services/storage";
 import { recurringService } from "@/modules/transactions/services/recurring";
-import { ArrowRightLeft, Users, Settings, Sun, Moon, Wallet, Shield, LogOut, Plus, Home as HomeIcon, Grid3X3, Tag, CreditCard, Archive, FileText, Bell, AlertCircle, Clock, CalendarClock, X, Download } from "lucide-react";
+import { ArrowRightLeft, Users, Settings, Sun, Moon, Wallet, Shield, LogOut, Plus, Home as HomeIcon, Grid3X3, Tag, CreditCard, Archive, FileText, Bell, AlertCircle, Clock, CalendarClock, X, Download, Smartphone } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import dynamic from 'next/dynamic';
 
 const DashboardWidgets = dynamic(() => import('@/modules/dashboard/components/DashboardWidgets'), { ssr: false });
-import BackupReminder from '@/components/BackupReminder';
+import ReminderFlow from '@/components/ReminderFlow';
 
 export default function Home() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -54,6 +54,12 @@ export default function Home() {
     const upcomingRecurring = recurringService.getUpcoming(7);
     if (upcomingRecurring.length > 0) {
       notifs.push({ id: 'recurring', type: 'info', text: `${upcomingRecurring.length} recurring payment(s) due this week`, href: '/transactions', icon: <CalendarClock className="w-5 h-5" /> });
+    }
+
+    const day = new Date().getDay();
+    if (day === 0 || day === 6) {
+      notifs.push({ id: 'weekend-backup', type: 'warning', text: 'Weekend reminder: Backup your data to stay safe', href: '/backup', icon: <Download className="w-5 h-5" /> });
+      notifs.push({ id: 'weekend-install', type: 'info', text: 'Install Money Meva on your device for offline access', href: '/install', icon: <Smartphone className="w-5 h-5" /> });
     }
 
     return notifs;
@@ -161,7 +167,7 @@ export default function Home() {
         </div>
       </main>
 
-      <BackupReminder />
+      <ReminderFlow />
 
       <footer className="max-w-5xl mx-auto px-4 py-4 mt-8" style={{ borderTop: '1px solid var(--border-color)' }}>
         <div className="flex items-center justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
