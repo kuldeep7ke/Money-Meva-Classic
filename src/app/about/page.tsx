@@ -31,8 +31,9 @@ export default function AboutPage() {
             </div>
             <p style={{ color: 'var(--text-secondary)' }}>
               Money Meva is a comprehensive shared finance management application designed for individuals,
-              families, and small businesses. Track transactions, manage partners, monitor loans and investments,
-              and gain insights into your financial health.
+              families, and small businesses. Track transactions with double-entry accounting, manage partners,
+              monitor loans and investments, and gain insights into your financial health — all offline-first
+              with automatic IndexedDB storage.
             </p>
           </div>
 
@@ -45,8 +46,11 @@ export default function AboutPage() {
               {[
                 { label: 'Version', value: `v${APP_VERSION}` },
                 { label: 'License', value: 'Proprietary' },
-                { label: 'Platform', value: 'Web (Next.js)' },
-                { label: 'Storage', value: 'Offline-first (IndexedDB)' },
+                { label: 'Framework', value: 'Next.js 14 + TypeScript' },
+                { label: 'Styling', value: 'Tailwind CSS' },
+                { label: 'Storage', value: 'IndexedDB (Dexie.js)' },
+                { label: 'Charts', value: 'Recharts' },
+                { label: 'Deployment', value: 'Static Export (Netlify)' },
                 { label: 'Last Updated', value: new Date().toLocaleDateString() },
               ].map((item, i) => (
                 <div key={i} className="flex justify-between py-2 border-b" style={{ borderColor: 'var(--border-color)' }}>
@@ -63,17 +67,22 @@ export default function AboutPage() {
               <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Features</h2>
             </div>
             <ul className="space-y-2" style={{ color: 'var(--text-secondary)' }}>
-              <li>• 13 transaction types (income, expense, transfer, loan, EMI, etc.)</li>
-              <li>• Partner management with groups and balance tracking</li>
-              <li>• Category management with usage tracking</li>
-              <li>• Loan and investment tracking with EMI schedules</li>
-              <li>• Recurring transactions with auto-generation</li>
-              <li>• Reports and analytics with charts</li>
-              <li>• Full backup and restore functionality</li>
-              <li>• Archive system for deleted items</li>
-              <li>• Session lock with PIN protection</li>
-              <li>• Dark mode support</li>
+              <li>• 13 transaction types with double-entry accounting (from/to accounts)</li>
+              <li>• Account system (Cash, Bank, UPI, Wallet) with balance tracking and per-account ledger</li>
+              <li>• Partner management with groups and auto-updating balances</li>
+              <li>• Category management with recent/most-used picker and usage tracking</li>
+              <li>• Loan, EMI, and investment tracking with progress bars and payment recording</li>
+              <li>• Recurring transactions with frequency-based due generation</li>
+              <li>• Reports and analytics with Recharts (daily, monthly, category, partner, financial year)</li>
+              <li>• User authentication with 3 roles: Admin, Manager, User</li>
+              <li>• Session lock with configurable inactivity timer and PIN protection</li>
+              <li>• Archive system with restore capability</li>
+              <li>• Full audit log with filters and export</li>
+              <li>• Danger Zone with 10 granular actions, math captcha, and typed confirmation</li>
+              <li>• Full backup and restore (merge/replace)</li>
+              <li>• Dark mode with Light/Dark/System toggle</li>
               <li>• Export to CSV, JSON, Excel, PDF</li>
+              <li>• Offline-first with IndexedDB (automatic migration from localStorage)</li>
             </ul>
           </div>
 
