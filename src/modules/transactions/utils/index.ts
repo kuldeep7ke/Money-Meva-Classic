@@ -19,6 +19,12 @@ export function calculateStats(transactions: Transaction[]): TransactionStats {
         stats.totalIncome += t.amount;
         break;
       case 'expense':
+      case 'split_bills':
+      case 'adjustment':
+      case 'recurring':
+      case 'installments':
+      case 'emi':
+      case 'upi_settlement':
         stats.totalExpense += t.amount;
         break;
       case 'loan':

@@ -62,7 +62,7 @@ export function TransactionList({
 
   const getGroupStats = (items: Transaction[]) => {
     const income = items.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-    const expense = items.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+    const expense = items.filter((t) => t.type === 'expense' || t.type === 'split_bills' || t.type === 'adjustment' || t.type === 'recurring' || t.type === 'installments' || t.type === 'emi' || t.type === 'upi_settlement').reduce((s, t) => s + t.amount, 0);
     return { income, expense, net: income - expense, count: items.length };
   };
 

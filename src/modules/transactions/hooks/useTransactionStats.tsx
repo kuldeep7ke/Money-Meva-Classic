@@ -21,8 +21,8 @@ export function useTransactionStats() {
     let expense = 0;
 
     monthlyTransactions.forEach((t) => {
-      if (t.type === 'income') income += t.amount;
-      if (t.type === 'expense') expense += t.amount;
+      if (t.type === 'income' || t.type === 'investment') income += t.amount;
+      if (t.type === 'expense' || t.type === 'split_bills' || t.type === 'adjustment' || t.type === 'recurring' || t.type === 'installments' || t.type === 'emi' || t.type === 'upi_settlement') expense += t.amount;
     });
 
     return {
@@ -41,8 +41,8 @@ export function useTransactionStats() {
     let expense = 0;
 
     dailyTransactions.forEach((t) => {
-      if (t.type === 'income') income += t.amount;
-      if (t.type === 'expense') expense += t.amount;
+      if (t.type === 'income' || t.type === 'investment') income += t.amount;
+      if (t.type === 'expense' || t.type === 'split_bills' || t.type === 'adjustment' || t.type === 'recurring' || t.type === 'installments' || t.type === 'emi' || t.type === 'upi_settlement') expense += t.amount;
     });
 
     return {

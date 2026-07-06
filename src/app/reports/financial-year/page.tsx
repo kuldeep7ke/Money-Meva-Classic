@@ -33,7 +33,7 @@ export default function FinancialYearPage() {
   }, [transactions, fyStartYear]);
 
   const fyIncome = useMemo(() => fyTransactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0), [fyTransactions]);
-  const fyExpense = useMemo(() => fyTransactions.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0), [fyTransactions]);
+  const fyExpense = useMemo(() => fyTransactions.filter((t) => t.type === 'expense' || t.type === 'split_bills').reduce((s, t) => s + t.amount, 0), [fyTransactions]);
   const fyNet = fyIncome - fyExpense;
 
   const monthlyData = useMemo(() => {
@@ -48,7 +48,7 @@ export default function FinancialYearPage() {
         return d.getMonth() === m && d.getFullYear() === y;
       });
       const inc = monthTx.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-      const exp = monthTx.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+      const exp = monthTx.filter((t) => t.type === 'expense' || t.type === 'split_bills').reduce((s, t) => s + t.amount, 0);
       const net = inc - exp;
       carry += net;
       months.push({ label: `${monthNames[m]} ${y}`, short: monthNames[m], income: inc, expense: exp, net, carry, txCount: monthTx.length });
@@ -71,7 +71,7 @@ export default function FinancialYearPage() {
         return d >= weekStart && d <= weekEnd;
       });
       const inc = weekTx.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-      const exp = weekTx.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+      const exp = weekTx.filter((t) => t.type === 'expense' || t.type === 'split_bills').reduce((s, t) => s + t.amount, 0);
       const startStr = `${weekStart.getDate()}/${weekStart.getMonth() + 1}`;
       const endStr = `${weekEnd.getDate()}/${weekEnd.getMonth() + 1}`;
       weeks.push({ label: `Week ${weekNum} (${startStr} - ${endStr})`, income: inc, expense: exp, net: inc - exp, txCount: weekTx.length });
@@ -89,7 +89,7 @@ export default function FinancialYearPage() {
     Array.from(allYears).sort().forEach((y) => {
       const yearTx = transactions.filter((t) => new Date(t.date).getFullYear() === y);
       const inc = yearTx.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-      const exp = yearTx.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+      const exp = yearTx.filter((t) => t.type === 'expense' || t.type === 'split_bills').reduce((s, t) => s + t.amount, 0);
       years.push({ label: `FY ${y}-${(y + 1).toString().slice(-2)}`, income: inc, expense: exp, net: inc - exp, txCount: yearTx.length });
     });
     return years;

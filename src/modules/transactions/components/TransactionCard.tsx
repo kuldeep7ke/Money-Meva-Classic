@@ -99,8 +99,8 @@ export function TransactionCard({
       </div>
 
       <div className="flex items-center gap-3 flex-shrink-0">
-        <span className="text-base font-bold" style={{ color: transaction.type === 'income' ? '#22c55e' : transaction.type === 'expense' ? '#ef4444' : 'var(--text-primary)' }}>
-          {transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : ''}{formatCurrency(transaction.amount)}
+        <span className="text-base font-bold" style={{ color: transaction.type === 'income' || transaction.type === 'investment' ? '#22c55e' : transaction.type === 'expense' || transaction.type === 'loan' || transaction.type === 'split_bills' || transaction.type === 'adjustment' || transaction.type === 'installments' || transaction.type === 'emi' || transaction.type === 'upi_settlement' ? '#ef4444' : 'var(--text-primary)' }}>
+          {transaction.type === 'income' || transaction.type === 'investment' ? '+' : transaction.type === 'expense' || transaction.type === 'loan' || transaction.type === 'split_bills' || transaction.type === 'adjustment' || transaction.type === 'installments' || transaction.type === 'emi' || transaction.type === 'upi_settlement' ? '-' : ''}{formatCurrency(transaction.amount)}
         </span>
         <div className="relative">
           <button onClick={() => setShowMenu(!showMenu)} className="p-1.5 rounded-lg hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>

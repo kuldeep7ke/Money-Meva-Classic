@@ -27,7 +27,7 @@ export default function DashboardWidgets() {
   const loans = useMemo(() => loanService.getAll(), [mounted]);
 
   const totalIncome = useMemo(() => transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0), [transactions]);
-  const totalExpense = useMemo(() => transactions.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0), [transactions]);
+  const totalExpense = useMemo(() => transactions.filter((t) => t.type === 'expense' || t.type === 'split_bills').reduce((s, t) => s + t.amount, 0), [transactions]);
   const balance = totalIncome - totalExpense;
   const totalAccountBalance = useMemo(() => accounts.reduce((s, a) => s + a.balance, 0), [accounts]);
 
@@ -255,16 +255,16 @@ export default function DashboardWidgets() {
             {upcomingRecurring.slice(0, 4).map((t) => (
               <div key={t.id + t.date} className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid var(--border-color)' }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: t.type === 'income' ? '#22c55e18' : '#ef444418' }}>
-                    {t.type === 'income' ? <ArrowUpRight className="w-4 h-4" style={{ color: '#22c55e' }} /> : <ArrowDownRight className="w-4 h-4" style={{ color: '#ef4444' }} />}
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: t.type === 'income' || t.type === 'investment' ? '#22c55e18' : '#ef444418' }}>
+                    {t.type === 'income' || t.type === 'investment' ? <ArrowUpRight className="w-4 h-4" style={{ color: '#22c55e' }} /> : <ArrowDownRight className="w-4 h-4" style={{ color: '#ef4444' }} />}
                   </div>
                   <div>
                     <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{t.description}</p>
                     <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.date} · {t.recurringFrequency}</p>
                   </div>
                 </div>
-                <span className="text-sm font-bold" style={{ color: t.type === 'income' ? '#22c55e' : '#ef4444' }}>
-                  {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                <span className="text-sm font-bold" style={{ color: t.type === 'income' || t.type === 'investment' ? '#22c55e' : '#ef4444' }}>
+                  {t.type === 'income' || t.type === 'investment' ? '+' : '-'}{formatCurrency(t.amount)}
                 </span>
               </div>
             ))}
@@ -284,14 +284,16 @@ export default function DashboardWidgets() {
           </div>
           <div className="space-y-3">
             {recentTx.length > 0 ? recentTx.map((t) => {
-              const isIncome = t.type === 'income';
+              const isPositive = t.type === 'income' || t.type === 'investment';
+              const isNegative = t.type === 'expense' || t.type === 'split_bills' || t.type === 'loan' || t.type === 'adjustment' || t.type === 'recurring' || t.type === 'installments' || t.type === 'emi' || t.type === 'upi_settlement';
+              const amountColor = isPositive ? '#22c55e' : isNegative ? '#ef4444' : 'var(--text-primary)';
               const fromAcc = t.fromAccountId ? accounts.find((a) => a.id === t.fromAccountId) : null;
               const toAcc = t.toAccountId ? accounts.find((a) => a.id === t.toAccountId) : null;
               return (
                 <div key={t.id} className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid var(--border-color)' }}>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: isIncome ? '#22c55e18' : '#ef444418' }}>
-                      {isIncome ? <ArrowUpRight className="w-4 h-4" style={{ color: '#22c55e' }} /> : <ArrowDownRight className="w-4 h-4" style={{ color: '#ef4444' }} />}
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: isPositive ? '#22c55e18' : isNegative ? '#ef444418' : 'var(--bg-secondary)' }}>
+                      {isPositive ? <ArrowUpRight className="w-4 h-4" style={{ color: '#22c55e' }} /> : isNegative ? <ArrowDownRight className="w-4 h-4" style={{ color: '#ef4444' }} /> : <ArrowRight className="w-4 h-4" style={{ color: 'var(--text-muted)' }} />}
                     </div>
                     <div>
                       <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{t.description}</p>
@@ -305,8 +307,8 @@ export default function DashboardWidgets() {
                       </p>
                     </div>
                   </div>
-                  <span className="text-sm font-bold" style={{ color: isIncome ? '#22c55e' : '#ef4444' }}>
-                    {isIncome ? '+' : '-'}{formatCurrency(t.amount)}
+                  <span className="text-sm font-bold" style={{ color: amountColor }}>
+                    {isPositive ? '+' : isNegative ? '-' : ''}{formatCurrency(t.amount)}
                   </span>
                 </div>
               );

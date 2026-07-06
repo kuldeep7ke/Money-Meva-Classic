@@ -26,7 +26,7 @@ export default function ReportsPage() {
 
   const stats = useMemo(() => {
     let income = 0, expense = 0;
-    filteredTransactions.forEach((t) => { if (t.type === 'income') income += t.amount; if (t.type === 'expense') expense += t.amount; });
+    filteredTransactions.forEach((t) => { if (t.type === 'income') income += t.amount; if (t.type === 'expense' || t.type === 'split_bills') expense += t.amount; });
     return { income, expense, balance: income - expense, count: filteredTransactions.length };
   }, [filteredTransactions]);
 
@@ -42,7 +42,7 @@ export default function ReportsPage() {
       const day = new Date(t.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
       if (!map[day]) map[day] = { income: 0, expense: 0 };
       if (t.type === 'income') map[day].income += t.amount;
-      if (t.type === 'expense') map[day].expense += t.amount;
+      if (t.type === 'expense' || t.type === 'split_bills') map[day].expense += t.amount;
     });
     return Object.entries(map).map(([date, data]) => ({ date, ...data }));
   }, [filteredTransactions]);
@@ -59,7 +59,7 @@ export default function ReportsPage() {
       const partner = t.partnerId || 'No Partner';
       if (!map[partner]) map[partner] = { income: 0, expense: 0 };
       if (t.type === 'income') map[partner].income += t.amount;
-      if (t.type === 'expense') map[partner].expense += t.amount;
+      if (t.type === 'expense' || t.type === 'split_bills') map[partner].expense += t.amount;
     });
     return Object.entries(map).map(([name, data]) => ({ name, ...data, balance: data.income - data.expense })).sort((a, b) => b.balance - a.balance);
   }, [filteredTransactions]);

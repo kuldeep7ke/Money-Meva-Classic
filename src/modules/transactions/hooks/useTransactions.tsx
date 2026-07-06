@@ -14,7 +14,7 @@ function updatePartnerBalance(transaction: Transaction, delta: number) {
   if (!transaction.partnerId) return;
   const partner = partnerService.getById(transaction.partnerId);
   if (!partner) return;
-  const amountDelta = transaction.type === 'income' ? delta : -delta;
+  const amountDelta = transaction.type === 'income' || transaction.type === 'loan' ? delta : -delta;
   partnerService.updateBalance(transaction.partnerId, amountDelta);
 }
 

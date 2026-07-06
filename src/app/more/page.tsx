@@ -36,12 +36,12 @@ export default function MorePage() {
 
   const activeLoans = loans.filter((l) => l.status === 'active');
   const totalIncome = transactions.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const totalExpense = transactions.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const totalExpense = transactions.filter((t) => t.type === 'expense' || t.type === 'split_bills').reduce((s, t) => s + t.amount, 0);
 
   const topCategories = useMemo(() => {
     const catMap = new Map<string, { name: string; color: string; total: number; count: number }>();
     transactions.forEach((t) => {
-      if (t.type === 'expense' && t.categoryId) {
+      if ((t.type === 'expense' || t.type === 'split_bills') && t.categoryId) {
         const cat = categories.find((c) => c.id === t.categoryId);
         if (cat) {
           const existing = catMap.get(t.categoryId);
