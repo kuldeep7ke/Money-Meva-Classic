@@ -181,7 +181,7 @@ export default function Home() {
 
       <footer className="max-w-5xl mx-auto px-4 py-4 mt-8" style={{ borderTop: '1px solid var(--border-color)' }}>
         <div className="flex items-center justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
-          <span>© {new Date().getFullYear()} Money Meva v1.1.0</span>
+          <span>© {new Date().getFullYear()} Money Meva v2.0.1</span>
           <div className="flex gap-4">
             <Link href="/about" className="hover:opacity-80">About</Link>
             <Link href="/contact" className="hover:opacity-80">Contact</Link>
