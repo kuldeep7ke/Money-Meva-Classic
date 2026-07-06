@@ -7,8 +7,7 @@ import { partnerService } from '@/modules/partners/services/storage';
 import { categoryService } from '@/modules/categories/services/storage';
 import { auditService } from '@/modules/transactions/services/audit';
 import { formatCurrency } from '@/utils';
-import { Home, Trash2, RotateCcw, Search, Filter, Database } from 'lucide-react';
-import Link from 'next/link';
+import { Home, Trash2, RotateCcw, Search, Database, CheckSquare } from 'lucide-react';
 import { usePinGuard } from '@/components/PinGuard';
 
 export default function ArchivePage() {
@@ -17,14 +16,18 @@ export default function ArchivePage() {
   const [activeTab, setActiveTab] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [confirmClear, setConfirmClear] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isSelectMode, setIsSelectMode] = useState(false);
   const { requestPin, PinModal } = usePinGuard();
 
   useEffect(() => { loadData(); }, []);
 
   const loadData = () => {
-    setItems(archiveService.getAll());
+    const all = archiveService.getAll();
+    setItems(all);
     setStats(archiveService.getStats());
+    setSelectedIds([]);
+    setIsSelectMode(false);
   };
 
   const filtered = items.filter((item) => {
@@ -42,15 +45,48 @@ export default function ArchivePage() {
     return true;
   });
 
+  const handleSelect = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === filtered.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filtered.map((i) => i.id));
+    }
+  };
+
+  const handleBulkRestore = () => {
+    requestPin(() => {
+      selectedIds.forEach((id) => {
+        const item = archiveService.getById(id);
+        if (!item) return;
+        const { entityType, data } = item;
+        if (entityType === 'transaction') storage.transactions.create(data);
+        else if (entityType === 'partner') partnerService.create(data);
+        else if (entityType === 'category') categoryService.create(data);
+        auditService.log({ action: `Restored ${entityType}`, entity: entityType, entityId: data.id, userId: 'user-1', businessId: 'default', details: `Restored from archive` });
+      });
+      archiveService.bulkRestore(selectedIds);
+      loadData();
+    });
+  };
+
+  const handleBulkDelete = () => {
+    requestPin(() => {
+      archiveService.bulkPermanentDelete(selectedIds);
+      loadData();
+    });
+  };
+
   const handleRestore = (archiveItem: ArchiveItem) => {
     const { entityType, data } = archiveItem;
-    if (entityType === 'transaction') {
-      storage.transactions.create(data);
-    } else if (entityType === 'partner') {
-      partnerService.create(data);
-    } else if (entityType === 'category') {
-      categoryService.create(data);
-    }
+    if (entityType === 'transaction') storage.transactions.create(data);
+    else if (entityType === 'partner') partnerService.create(data);
+    else if (entityType === 'category') categoryService.create(data);
     archiveService.restore(archiveItem.id);
     auditService.log({ action: `Restored ${entityType}`, entity: entityType, entityId: data.id, userId: 'user-1', businessId: 'default', details: `Restored from archive` });
     loadData();
@@ -60,14 +96,6 @@ export default function ArchivePage() {
     requestPin(() => {
       archiveService.permanentlyDelete(archiveId);
       setConfirmDelete(null);
-      loadData();
-    });
-  };
-
-  const handleClearAll = () => {
-    requestPin(() => {
-      archiveService.clear();
-      setConfirmClear(false);
       loadData();
     });
   };
@@ -97,8 +125,8 @@ export default function ArchivePage() {
               <Home className="w-5 h-5" /> Home
             </button>
             {items.length > 0 && (
-              <button onClick={() => setConfirmClear(true)} className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: '#ef4444', color: '#ef4444', backgroundColor: 'var(--bg-card)' }}>
-                <Trash2 className="w-5 h-5" /> Clear Archive
+              <button onClick={() => { setSelectedIds([]); setIsSelectMode(!isSelectMode); }} className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: isSelectMode ? 'var(--brand)' : 'var(--border-color)', color: isSelectMode ? 'var(--brand)' : 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
+                <CheckSquare className="w-5 h-5" /> {isSelectMode ? 'Cancel' : 'Select'}
               </button>
             )}
           </div>
@@ -118,16 +146,6 @@ export default function ArchivePage() {
           ))}
         </div>
 
-        {confirmClear && (
-          <div className="mb-6 p-4 rounded-lg border" style={{ backgroundColor: '#ef444422', borderColor: '#ef4444' }}>
-            <p className="mb-3" style={{ color: '#ef4444' }}>Permanently delete all archived items? This cannot be undone.</p>
-            <div className="flex gap-2">
-              <button onClick={handleClearAll} className="px-4 py-2 text-white rounded-lg" style={{ backgroundColor: '#ef4444' }}>Yes, Clear All</button>
-              <button onClick={() => setConfirmClear(false)} className="px-4 py-2 border rounded-lg" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}>Cancel</button>
-            </div>
-          </div>
-        )}
-
         <div className="flex items-center gap-3 mb-6">
           <div className="flex gap-2 flex-1">
             {['all', 'transaction', 'partner', 'category'].map((tab) => (
@@ -142,6 +160,19 @@ export default function ArchivePage() {
           </div>
         </div>
 
+        {isSelectMode && selectedIds.length > 0 && (
+          <div className="mb-4 flex items-center gap-2 p-3 rounded-lg border" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+            <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{selectedIds.length} selected</span>
+            <div className="flex-1" />
+            <button onClick={handleBulkRestore} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-white rounded-lg" style={{ backgroundColor: '#22c55e' }}>
+              <RotateCcw className="w-3.5 h-3.5" /> Restore All
+            </button>
+            <button onClick={handleBulkDelete} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-white rounded-lg" style={{ backgroundColor: '#ef4444' }}>
+              <Trash2 className="w-3.5 h-3.5" /> Delete All
+            </button>
+          </div>
+        )}
+
         <div className="rounded-lg border overflow-hidden" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
           {filtered.length === 0 ? (
             <div className="p-12 text-center" style={{ color: 'var(--text-muted)' }}>
@@ -150,9 +181,25 @@ export default function ArchivePage() {
             </div>
           ) : (
             <div className="divide-y" style={{ borderColor: 'var(--border-color)' }}>
+              {isSelectMode && (
+                <div className="px-4 py-2 flex items-center gap-2 border-b" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}>
+                  <button onClick={handleSelectAll} className="text-xs font-medium hover:opacity-80" style={{ color: 'var(--text-primary)' }}>
+                    {selectedIds.length === filtered.length ? 'Deselect All' : 'Select All'}
+                  </button>
+                </div>
+              )}
               {filtered.map((item) => (
                 <div key={item.id} className="px-4 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
+                    {isSelectMode && (
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(item.id)}
+                        onChange={() => handleSelect(item.id)}
+                        className="w-4 h-4 rounded"
+                        style={{ accentColor: 'var(--brand)' }}
+                      />
+                    )}
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: item.entityType === 'transaction' ? '#22c55e' : item.entityType === 'partner' ? '#3b82f6' : '#f59e0b' }}>
                       {item.entityType.charAt(0).toUpperCase()}
                     </div>
@@ -160,7 +207,6 @@ export default function ArchivePage() {
                       <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{getItemName(item)}</p>
                       <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                         {item.entityType} · Deleted {new Date(item.deletedAt).toLocaleString()}
-                        {item.restoreCount > 0 && <span> · Restored {item.restoreCount}x</span>}
                       </p>
                     </div>
                   </div>
@@ -168,14 +214,18 @@ export default function ArchivePage() {
                     {getItemAmount(item) !== null && (
                       <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{formatCurrency(getItemAmount(item)!)}</span>
                     )}
-                    <button onClick={() => handleRestore(item)} className="p-2 rounded-lg hover:opacity-80" style={{ backgroundColor: '#22c55e22' }} title="Restore"><RotateCcw className="w-4 h-4" style={{ color: '#22c55e' }} /></button>
-                    {confirmDelete === item.id ? (
-                      <div className="flex gap-1">
-                        <button onClick={() => handlePermanentDelete(item.id)} className="px-2 py-1 text-white text-xs rounded" style={{ backgroundColor: '#ef4444' }}>Delete</button>
-                        <button onClick={() => setConfirmDelete(null)} className="px-2 py-1 border text-xs rounded" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}>No</button>
-                      </div>
-                    ) : (
-                      <button onClick={() => setConfirmDelete(item.id)} className="p-2 rounded-lg hover:opacity-80" style={{ backgroundColor: '#ef444422' }} title="Permanent Delete"><Trash2 className="w-4 h-4" style={{ color: '#ef4444' }} /></button>
+                    {!isSelectMode && (
+                      <>
+                        <button onClick={() => handleRestore(item)} className="p-2 rounded-lg hover:opacity-80" style={{ backgroundColor: '#22c55e22' }} title="Restore"><RotateCcw className="w-4 h-4" style={{ color: '#22c55e' }} /></button>
+                        {confirmDelete === item.id ? (
+                          <div className="flex gap-1">
+                            <button onClick={() => handlePermanentDelete(item.id)} className="px-2 py-1 text-white text-xs rounded" style={{ backgroundColor: '#ef4444' }}>Delete</button>
+                            <button onClick={() => setConfirmDelete(null)} className="px-2 py-1 border text-xs rounded" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}>No</button>
+                          </div>
+                        ) : (
+                          <button onClick={() => setConfirmDelete(item.id)} className="p-2 rounded-lg hover:opacity-80" style={{ backgroundColor: '#ef444422' }} title="Permanent Delete"><Trash2 className="w-4 h-4" style={{ color: '#ef4444' }} /></button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

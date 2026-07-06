@@ -12,6 +12,7 @@ class IDBStorage {
 
   async init(): Promise<void> {
     if (!isClient || this.loaded) return;
+    const storeKeys = ['transactions', 'partners', 'partnerGroups', 'categories', 'users', 'accounts', 'loans', 'audit', 'archive'];
     try {
       const [transactions, partners, partnerGroups, categories, users, accounts, loans, audit, archive] = await Promise.all([
         db.transactions.toArray(),
@@ -27,8 +28,10 @@ class IDBStorage {
       this.cache = {
         transactions, partners, partnerGroups, categories, users, accounts, loans, audit, archive,
       };
-      this.loaded = true;
-    } catch {
+    } catch (e) {
+      console.error('IDB init failed, using empty cache:', e);
+      storeKeys.forEach((k) => { this.cache[k] = []; });
+    } finally {
       this.loaded = true;
     }
   }
@@ -89,12 +92,17 @@ class IDBStorage {
     return true;
   }
 
-  set(store: string, table: keyof typeof db, data: unknown[]): void {
+  async set(store: string, table: keyof typeof db, data: unknown[]): Promise<void> {
     this.ensureLoaded();
     this.cache[store] = data;
-    (db[table] as any).clear().then(() => {
-      (db[table] as any).bulkPut(data).catch(() => {});
-    }).catch(() => {});
+    try {
+      await (db[table] as any).clear();
+      if (data.length > 0) {
+        await (db[table] as any).bulkPut(data);
+      }
+    } catch (e) {
+      console.error(`IDB write failed for ${store}:`, e);
+    }
   }
 
   clear(store: string, table: keyof typeof db): void {

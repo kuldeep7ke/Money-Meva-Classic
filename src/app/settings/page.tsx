@@ -14,7 +14,6 @@ interface AppSettings {
   language: string;
   sessionTimeout: number;
   pinEnabled: boolean;
-  pin: string;
   businessName: string;
 }
 
@@ -24,7 +23,6 @@ const DEFAULT_SETTINGS: AppSettings = {
   language: 'en',
   sessionTimeout: 15,
   pinEnabled: false,
-  pin: '',
   businessName: 'My Business',
 };
 
@@ -82,7 +80,6 @@ export default function SettingsPage() {
 
   const handleSave = () => {
     localStorage.setItem('money_meva_settings', JSON.stringify(settings));
-    if (settings.pin) localStorage.setItem('money_meva_pin', settings.pin);
     localStorage.setItem('money_meva_session', JSON.stringify({ timeout: settings.sessionTimeout, pinEnabled: settings.pinEnabled }));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -253,17 +250,9 @@ export default function SettingsPage() {
                 </button>
               </div>
               {settings.pinEnabled && (
-                <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Set PIN</label>
-                  <input
-                    type="password"
-                    value={settings.pin || ''}
-                    onChange={(e) => setSettings({ ...settings, pin: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2"
-                    style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
-                    placeholder="Enter 4-6 digit PIN"
-                    maxLength={6}
-                  />
+                <div className="p-3 rounded-lg" style={{ backgroundColor: '#22c55e12', border: '1px solid #22c55e33' }}>
+                  <p className="text-sm font-medium" style={{ color: '#22c55e' }}>Uses your login PIN</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>Session lock will use your existing account PIN. No separate PIN needed.</p>
                 </div>
               )}
             </div>

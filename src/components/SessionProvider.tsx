@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
+import { useAuth } from '@/modules/auth/hooks/useAuth';
 
 interface SessionContextType {
   isLocked: boolean;
@@ -9,14 +10,11 @@ interface SessionContextType {
   setInterval: (minutes: number) => void;
   pinEnabled: boolean;
   setPinEnabled: (enabled: boolean) => void;
-  pin: string;
-  setPin: (pin: string) => void;
 }
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'money_meva_session';
-const PIN_KEY = 'money_meva_pin';
 
 function getSettings() {
   if (typeof window === 'undefined') return { timeout: 15, pinEnabled: false };
@@ -32,27 +30,15 @@ function saveSettings(settings: { timeout: number; pinEnabled: boolean }) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 }
 
-function getPin(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem(PIN_KEY) || '';
-}
-
-function savePin(pin: string) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(PIN_KEY, pin);
-}
-
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [isLocked, setIsLocked] = useState(false);
   const [settings, setSettings] = useState({ timeout: 15, pinEnabled: false });
-  const [pin, setPinState] = useState('');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     const s = getSettings();
     setSettings(s);
-    setPinState(getPin());
   }, []);
 
   useEffect(() => {
@@ -75,8 +61,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [mounted, settings.pinEnabled, settings.timeout]);
 
   const lock = useCallback(() => {
-    if (settings.pinEnabled && pin) setIsLocked(true);
-  }, [settings.pinEnabled, pin]);
+    if (settings.pinEnabled) setIsLocked(true);
+  }, [settings.pinEnabled]);
 
   const unlock = useCallback(() => {
     setIsLocked(false);
@@ -94,13 +80,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     saveSettings(newSettings);
   }, [settings]);
 
-  const setPin = useCallback((newPin: string) => {
-    setPinState(newPin);
-    savePin(newPin);
-  }, []);
-
   return (
-    <SessionContext.Provider value={{ isLocked, lock, unlock, setInterval, pinEnabled: settings.pinEnabled, setPinEnabled, pin, setPin }}>
+    <SessionContext.Provider value={{ isLocked, lock, unlock, setInterval, pinEnabled: settings.pinEnabled, setPinEnabled }}>
       {children}
     </SessionContext.Provider>
   );
@@ -113,14 +94,15 @@ export function useSession() {
 }
 
 export function SessionLockScreen() {
-  const { isLocked, unlock, pin } = useSession();
+  const { isLocked, unlock } = useSession();
+  const { user } = useAuth();
   const [input, setInput] = useState('');
   const [error, setError] = useState(false);
 
   if (!isLocked) return null;
 
   const handleUnlock = () => {
-    if (input === pin) {
+    if (user && input === user.pin) {
       unlock();
       setInput('');
       setError(false);

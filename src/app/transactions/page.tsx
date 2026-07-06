@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TransactionProvider, useTransactions } from '@/modules/transactions/hooks/useTransactions';
 import { useTransactionStats } from '@/modules/transactions/hooks/useTransactionStats';
 import { TransactionList } from '@/modules/transactions/components/TransactionList';
@@ -8,8 +8,9 @@ import { TransactionFilters } from '@/modules/transactions/components/Transactio
 import { TransactionForm } from '@/modules/transactions/components/TransactionForm';
 import { formatCurrency } from '@/utils';
 import { useRouter } from 'next/navigation';
-import { Plus, TrendingUp, TrendingDown, Wallet, ArrowRightLeft, Home, RefreshCw } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, Wallet, ArrowRightLeft, Home, RefreshCw, Archive } from 'lucide-react';
 import { usePinGuard } from '@/components/PinGuard';
+import { archiveService } from '@/modules/archive/services/storage';
 import dynamic from 'next/dynamic';
 
 const RecurringPanel = dynamic(() => import('@/modules/transactions/components/RecurringPanel'), { ssr: false });
@@ -20,7 +21,12 @@ function TransactionsContent() {
   const { stats, monthlyStats, dailyStats } = useTransactionStats();
   const [showForm, setShowForm] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'recurring'>('all');
+  const [hasArchived, setHasArchived] = useState(false);
   const { requestPin, PinModal } = usePinGuard();
+
+  useEffect(() => {
+    setHasArchived(archiveService.getStats().transactions > 0);
+  }, []);
 
   const handleCreate = (data: Parameters<typeof addTransaction>[0]) => {
     addTransaction(data);
@@ -60,6 +66,15 @@ function TransactionsContent() {
             >
               <Home className="w-5 h-5" /> Home
             </button>
+            {hasArchived && (
+              <button
+                onClick={() => router.push('/archive')}
+                className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80"
+                style={{ borderColor: '#f97316', color: '#f97316', backgroundColor: '#f9731608' }}
+              >
+                <Archive className="w-5 h-5" /> Archive
+              </button>
+            )}
             <button
               onClick={() => setShowForm(true)}
               className="flex items-center gap-2 px-4 py-2 text-white rounded-lg hover:opacity-90"

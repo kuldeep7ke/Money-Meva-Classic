@@ -32,16 +32,20 @@ export const archiveService = {
     });
   },
 
-  restore: (archiveId: string): ArchiveItem | null => {
-    const item = idbStorage.getById<ArchiveItem>('archive', archiveId);
-    if (!item) return null;
-    return idbStorage.update<ArchiveItem>('archive', 'archive', archiveId, {
-      restoreCount: item.restoreCount + 1,
-    });
+  restore: (archiveId: string): boolean => {
+    return idbStorage.delete('archive', 'archive', archiveId);
+  },
+
+  bulkRestore: (ids: string[]): void => {
+    ids.forEach((id) => archiveService.restore(id));
   },
 
   permanentlyDelete: (archiveId: string): boolean => {
     return idbStorage.delete('archive', 'archive', archiveId);
+  },
+
+  bulkPermanentDelete: (ids: string[]): void => {
+    ids.forEach((id) => archiveService.permanentlyDelete(id));
   },
 
   clear: () => {

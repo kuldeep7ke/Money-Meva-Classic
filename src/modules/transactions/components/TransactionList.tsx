@@ -4,8 +4,7 @@ import { Transaction } from '@/modules/transactions/types';
 import { TransactionCard } from './TransactionCard';
 import { groupByDate, groupByWeek, groupByMonth, formatCurrency } from '@/utils';
 import { useState, useMemo } from 'react';
-import { Trash2, Download, Calendar, ChevronDown } from 'lucide-react';
-import { exportService } from '../services/export';
+import { Trash2, Calendar, ChevronDown } from 'lucide-react';
 
 type GroupBy = 'day' | 'week' | 'month';
 
@@ -56,24 +55,6 @@ export function TransactionList({
       onBulkDelete(selectedIds);
       setSelectedIds([]);
       setIsSelectMode(false);
-    }
-  };
-
-  const handleExport = (format: 'csv' | 'json' | 'excel') => {
-    const selectedTransactions = selectedIds.length > 0
-      ? transactions.filter((t) => selectedIds.includes(t.id))
-      : transactions;
-
-    switch (format) {
-      case 'csv':
-        exportService.downloadCSV(selectedTransactions);
-        break;
-      case 'json':
-        exportService.downloadJSON(selectedTransactions);
-        break;
-      case 'excel':
-        exportService.toExcel(selectedTransactions);
-        break;
     }
   };
 
@@ -146,18 +127,7 @@ export function TransactionList({
             )}
           </div>
 
-          <div className="relative group">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm border rounded-lg hover:opacity-80" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
-              <Download className="w-3.5 h-3.5" /> Export
-            </button>
-            <div className="absolute right-0 top-full mt-1 border rounded-lg shadow-lg z-10 min-w-[120px] hidden group-hover:block" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-              {(['csv', 'json', 'excel'] as const).map((f) => (
-                <button key={f} onClick={() => handleExport(f)} className="w-full px-3 py-2 text-left text-sm hover:opacity-80 first:rounded-t-lg last:rounded-b-lg" style={{ color: 'var(--text-primary)' }}>
-                  {f.toUpperCase()}
-                </button>
-              ))}
-            </div>
-          </div>
+
         </div>
       </div>
 

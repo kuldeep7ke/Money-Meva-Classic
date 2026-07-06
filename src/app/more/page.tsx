@@ -91,6 +91,7 @@ export default function MorePage() {
   const tools: { href: string; icon: React.ReactNode; label: string; desc: string; color: string; count?: number }[] = [
     { href: '/reports', icon: <BarChart3 className="w-5 h-5" />, label: 'Reports', desc: 'Financial insights & analytics', color: '#06b6d4' },
     ...(hasPermission('users.read') ? [{ href: '/users', icon: <Shield className="w-5 h-5" />, label: 'Users', desc: 'Manage user accounts & roles', color: '#ef4444', count: users.length }] : []),
+    { href: '/archive', icon: <Archive className="w-5 h-5" />, label: 'Archive', desc: 'Restore or permanently delete', color: '#f97316' },
     { href: '/backup', icon: <Database className="w-5 h-5" />, label: 'Backup', desc: 'Export & import your data', color: '#6366f1' },
     { href: '/install', icon: <Download className="w-5 h-5" />, label: 'Install App', desc: 'Add to your device for offline access', color: '#22c55e' },
   ];
@@ -324,18 +325,6 @@ export default function MorePage() {
           </div>
         )}
 
-        {hasPermission('danger.clean_all') && (
-          <button onClick={() => requestPin(() => router.push('/danger'))} className="w-full flex items-center gap-3 p-3 rounded-xl hover:opacity-90 transition-all text-left" style={{ backgroundColor: '#ef444410', border: '1px solid #ef444422' }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#ef444418' }}>
-              <AlertTriangle className="w-5 h-5" style={{ color: '#ef4444' }} />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium" style={{ color: '#ef4444' }}>Danger Zone</p>
-              <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>Clear data, reset settings</p>
-            </div>
-            <ChevronRight className="w-4 h-4" style={{ color: '#ef4444' }} />
-          </button>
-        )}
       </main>
       {PinModal}
     </div>

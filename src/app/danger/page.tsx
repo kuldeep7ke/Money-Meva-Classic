@@ -12,11 +12,10 @@ import { authService } from '@/modules/auth/services/storage';
 import { archiveService } from '@/modules/archive/services/storage';
 import { idbStorage } from '@/lib/idbStorage';
 import MathCaptcha from '@/components/MathCaptcha';
-import { useConfirm } from '@/components/ConfirmDialog';
-import { AlertTriangle, Trash2, Shield, ArrowLeft, CheckCircle, RotateCcw, Users, Tag, FolderOpen, HandCoins, CreditCard, Database, FileText, Archive, Settings } from 'lucide-react';
+import { AlertTriangle, Trash2, Shield, ArrowLeft, CheckCircle, RotateCcw, Users, Tag, FolderOpen, HandCoins, CreditCard, Database, FileText, Archive } from 'lucide-react';
 import Link from 'next/link';
 
-type ActionState = 'idle' | 'captcha' | 'confirm' | 'done';
+type ActionState = 'idle' | 'captcha' | 'done';
 
 interface DangerAction {
   id: string;
@@ -32,7 +31,6 @@ interface DangerAction {
 
 export default function DangerZonePage() {
   const { user, hasPermission, refreshUser } = useAuth();
-  const { confirm } = useConfirm();
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [actionStep, setActionStep] = useState<ActionState>('idle');
@@ -65,27 +63,7 @@ export default function DangerZonePage() {
     setCaptchaVerified(false);
   };
 
-  const proceedToConfirm = () => {
-    if (!captchaVerified) return;
-    setActionStep('confirm');
-  };
-
-  const executeAction = async (action: DangerAction) => {
-    const ok = await confirm({
-      title: `Confirm: ${action.title}`,
-      message: `This will permanently delete ${action.deleteItems.join(', ')}. Type "${action.confirmWord}" in the next step.`,
-      confirmText: action.confirmWord,
-      variant: 'danger',
-    });
-    if (!ok) { resetAction(); return; }
-
-    const input = window.prompt(`Type "${action.confirmWord}" to confirm:`);
-    if (input !== action.confirmWord) {
-      window.alert('Incorrect confirmation text. Action cancelled.');
-      resetAction();
-      return;
-    }
-
+  const executeAction = (action: DangerAction) => {
     action.action();
     auditService.logBackup('Cleared', user?.id || '', 'default', `${action.title} executed from Danger Zone`);
     setCompletedActions((prev) => [...prev, action.id]);
@@ -299,33 +277,68 @@ export default function DangerZonePage() {
                     <div className="mt-4 pt-3 border-t" style={{ borderColor: 'var(--border-color)' }}>
                       {actionStep === 'captcha' && (
                         <div className="space-y-3">
-                          <p className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Complete the captcha to continue:</p>
-                          <MathCaptcha onVerify={(v) => setCaptchaVerified(v)} />
-                          <div className="flex gap-2">
-                            {captchaVerified && (
-                              <button onClick={proceedToConfirm} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-white rounded-lg" style={{ backgroundColor: action.color }}>
-                                Continue <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
-                              </button>
-                            )}
-                            <button onClick={resetAction} className="text-xs" style={{ color: 'var(--text-muted)' }}>Cancel</button>
-                          </div>
-                        </div>
-                      )}
+                          {!captchaVerified ? (
+                            <>
+                              <p className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Complete the captcha to continue:</p>
+                              <MathCaptcha onVerify={(v) => setCaptchaVerified(v)} />
+                              <button onClick={resetAction} className="text-xs" style={{ color: 'var(--text-muted)' }}>Cancel</button>
+                            </>
+                          ) : (
+                            <>
+                              <div className="p-4 rounded-xl border-2" style={{ backgroundColor: `${action.color}08`, borderColor: action.color }}>
+                                <div className="flex items-center gap-3 mb-3 pb-3 border-b" style={{ borderColor: `${action.color}33` }}>
+                                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${action.color}20` }}>
+                                    <Shield className="w-5 h-5" style={{ color: action.color }} />
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-bold" style={{ color: action.color }}>Final Confirmation</p>
+                                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>This action cannot be undone</p>
+                                  </div>
+                                </div>
 
-                      {actionStep === 'confirm' && (
-                        <div className="space-y-3">
-                          <div className="p-3 rounded-lg" style={{ backgroundColor: `${action.color}12`, border: `1px solid ${action.color}33` }}>
-                            <p className="text-xs font-bold" style={{ color: action.color }}>Final Confirmation</p>
-                            <p className="text-[11px] mt-1" style={{ color: 'var(--text-muted)' }}>
-                              This action is irreversible. You will be prompted to type <span className="font-bold" style={{ color: action.color }}>&quot;{action.confirmWord}&quot;</span> to confirm.
-                            </p>
-                          </div>
-                          <div className="flex gap-2">
-                            <button onClick={() => executeAction(action)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-white rounded-lg" style={{ backgroundColor: action.color }}>
-                              <Trash2 className="w-3.5 h-3.5" /> Proceed
-                            </button>
-                            <button onClick={resetAction} className="text-xs" style={{ color: 'var(--text-muted)' }}>Cancel</button>
-                          </div>
+                                {user && (
+                                  <div className="flex items-center gap-2 mb-3 p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: 'var(--brand)' }}>
+                                      {user.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                      <p className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{user.name}</p>
+                                      <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Administrator</p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>You are about to delete:</p>
+                                <div className="space-y-1 mb-3">
+                                  {action.deleteItems.map((item) => (
+                                    <div key={item} className="flex items-center gap-2 text-xs" style={{ color: action.color }}>
+                                      <span>✕</span> {item}
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {action.preserveItems && action.preserveItems.length > 0 && (
+                                  <>
+                                    <p className="text-xs font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Will be preserved:</p>
+                                    <div className="space-y-1 mb-3">
+                                      {action.preserveItems.map((item) => (
+                                        <div key={item} className="flex items-center gap-2 text-xs" style={{ color: '#22c55e' }}>
+                                          <span>✓</span> {item}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </>
+                                )}
+
+                                <div className="flex gap-2 mt-3 pt-3 border-t" style={{ borderColor: `${action.color}33` }}>
+                                  <button onClick={() => executeAction(action)} className="flex items-center gap-1.5 px-4 py-2 text-xs text-white rounded-lg font-medium" style={{ backgroundColor: action.color }}>
+                                    <Trash2 className="w-3.5 h-3.5" /> Confirm & Execute
+                                  </button>
+                                  <button onClick={resetAction} className="text-xs px-3 py-2 rounded-lg" style={{ color: 'var(--text-muted)', backgroundColor: 'var(--bg-secondary)' }}>Cancel</button>
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
                       )}
 
