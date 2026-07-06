@@ -16,14 +16,14 @@ export default function OnboardingPage() {
   const [confirmPin, setConfirmPin] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setError('');
     if (!name.trim()) { setError('Name is required'); return; }
     if (!email.trim() || !email.includes('@')) { setError('Valid email is required'); return; }
     if (pin.length < 4) { setError('PIN must be at least 4 digits'); return; }
     if (pin !== confirmPin) { setError('PINs do not match'); return; }
 
-    authService.onboard(name.trim(), email.trim(), pin);
+    await authService.onboard(name.trim(), email.trim(), pin);
     refreshUser();
     router.push('/');
   };

@@ -42,7 +42,7 @@ export const authService = {
     return user;
   },
 
-  onboard: (name: string, email: string, pin: string): User => {
+  onboard: async (name: string, email: string, pin: string): Promise<User> => {
     const user: User = {
       id: crypto.randomUUID(),
       name,
@@ -53,7 +53,7 @@ export const authService = {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    idbStorage.set('users', 'users', [user]);
+    await idbStorage.set('users', 'users', [user]);
     authService.loginByPin(pin);
     return user;
   },
