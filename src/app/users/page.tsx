@@ -132,13 +132,13 @@ export default function UsersPage() {
               </div>
             </div>
 
-            <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-              <p className="text-[10px] font-semibold uppercase mb-1" style={{ color: 'var(--text-muted)' }}>Role Permissions</p>
-              <div className="flex flex-wrap gap-1">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <p className="text-xs font-bold uppercase mb-2" style={{ color: 'var(--text-muted)' }}>Role Permissions</p>
+              <div className="flex flex-wrap gap-1.5">
                 {ROLE_PERMISSIONS[role].slice(0, 10).map((p) => (
-                  <span key={p} className="text-[9px] px-1.5 py-0.5 rounded" style={{ backgroundColor: `${ROLE_COLORS[role]}18`, color: ROLE_COLORS[role] }}>{p}</span>
+                  <span key={p} className="text-[11px] px-2 py-1 rounded" style={{ backgroundColor: `${ROLE_COLORS[role]}18`, color: ROLE_COLORS[role] }}>{p}</span>
                 ))}
-                {ROLE_PERMISSIONS[role].length > 10 && <span className="text-[9px] px-1.5 py-0.5 rounded" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-muted)' }}>+{ROLE_PERMISSIONS[role].length - 10} more</span>}
+                {ROLE_PERMISSIONS[role].length > 10 && <span className="text-[11px] px-2 py-1 rounded" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-muted)' }}>+{ROLE_PERMISSIONS[role].length - 10} more</span>}
               </div>
             </div>
 
@@ -159,14 +159,14 @@ export default function UsersPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{u.name}</p>
-                    {u.id === currentUser?.id && <span className="text-[9px] px-1.5 py-0.5 rounded font-bold" style={{ backgroundColor: 'var(--brand)18', color: 'var(--brand)' }}>YOU</span>}
+                    <p className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>{u.name}</p>
+                    {u.id === currentUser?.id && <span className="text-[10px] px-2 py-0.5 rounded font-bold" style={{ backgroundColor: 'var(--brand)18', color: 'var(--brand)' }}>YOU</span>}
                   </div>
-                  <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{u.email} · Last login: {u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never'}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{u.email} · Last login: {u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : 'Never'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs font-bold px-2 py-1 rounded" style={{ backgroundColor: `${ROLE_COLORS[u.role]}18`, color: ROLE_COLORS[u.role] }}>{ROLE_LABELS[u.role]}</span>
+                <span className="text-sm font-bold px-3 py-1.5 rounded" style={{ backgroundColor: `${ROLE_COLORS[u.role]}18`, color: ROLE_COLORS[u.role] }}>{ROLE_LABELS[u.role]}</span>
                 {canManage && u.id !== currentUser?.id && (
                   <div className="relative">
                     <button onClick={() => setShowMenu(showMenu === u.id ? null : u.id)} className="p-1.5 rounded-lg hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
@@ -185,19 +185,19 @@ export default function UsersPage() {
           ))}
         </div>
 
-        <div className="p-4 rounded-xl border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-          <h3 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Role Access Overview</h3>
-          <div className="space-y-3">
+        <div className="p-5 rounded-xl border" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+          <h3 className="text-base font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Role Access Overview</h3>
+          <div className="space-y-4">
             {(['admin', 'manager', 'user'] as UserRole[]).map((r) => (
-              <div key={r} className="p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: ROLE_COLORS[r] }} />
-                  <span className="text-xs font-bold" style={{ color: ROLE_COLORS[r] }}>{ROLE_LABELS[r]}</span>
-                  <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>({ROLE_PERMISSIONS[r].length} permissions)</span>
+              <div key={r} className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: ROLE_COLORS[r] }} />
+                  <span className="text-sm font-bold" style={{ color: ROLE_COLORS[r] }}>{ROLE_LABELS[r]}</span>
+                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>({ROLE_PERMISSIONS[r].length} permissions)</span>
                 </div>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1.5">
                   {ROLE_PERMISSIONS[r].map((p) => (
-                    <span key={p} className="text-[9px] px-1 py-0.5 rounded" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-muted)' }}>{p}</span>
+                    <span key={p} className="text-[11px] px-2 py-1 rounded" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-muted)' }}>{p}</span>
                   ))}
                 </div>
               </div>
