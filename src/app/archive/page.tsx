@@ -8,6 +8,7 @@ import { categoryService } from '@/modules/categories/services/storage';
 import { auditService } from '@/modules/transactions/services/audit';
 import { formatCurrency } from '@/utils';
 import { Home, Trash2, RotateCcw, Search, Database, CheckSquare } from 'lucide-react';
+import Link from 'next/link';
 import { usePinGuard } from '@/components/PinGuard';
 
 export default function ArchivePage() {
@@ -114,18 +115,20 @@ export default function ArchivePage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
       {PinModal}
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Archive</h1>
-            <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>Deleted items can be restored from here</p>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="p-3 rounded-xl hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <Home className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Archive</h1>
+              <p className="text-base mt-1" style={{ color: 'var(--text-secondary)' }}>Deleted items can be restored from here</p>
+            </div>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => window.location.href = '/'} className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
-              <Home className="w-5 h-5" /> Home
-            </button>
             {items.length > 0 && (
-              <button onClick={() => { setSelectedIds([]); setIsSelectMode(!isSelectMode); }} className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: isSelectMode ? 'var(--brand)' : 'var(--border-color)', color: isSelectMode ? 'var(--brand)' : 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
+              <button onClick={() => { setSelectedIds([]); setIsSelectMode(!isSelectMode); }} className="flex items-center gap-2 px-4 py-3 border rounded-xl hover:opacity-80" style={{ borderColor: isSelectMode ? 'var(--brand)' : 'var(--border-color)', color: isSelectMode ? 'var(--brand)' : 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
                 <CheckSquare className="w-5 h-5" /> {isSelectMode ? 'Cancel' : 'Select'}
               </button>
             )}

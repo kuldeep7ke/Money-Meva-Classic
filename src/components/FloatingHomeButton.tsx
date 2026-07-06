@@ -17,11 +17,11 @@ export default function FloatingHomeButton() {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-      className="fixed bottom-8 right-8 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-105"
+      className="fixed bottom-20 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-110"
       style={{ backgroundColor: 'var(--brand)', color: '#fff' }}
+      title="Scroll to top"
     >
-      <ArrowUp className="w-5 h-5" />
-      <span className="text-sm font-bold">Top</span>
+      <ArrowUp className="w-6 h-6" />
     </button>
   );
 }

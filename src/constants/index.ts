@@ -1,5 +1,5 @@
 export const APP_NAME = 'Money Meva';
-export const APP_VERSION = '2.0.1';
+export const APP_VERSION = '2.0.2';
 
 export const STORAGE_KEYS = {
   TRANSACTIONS: 'money_meva_transactions',

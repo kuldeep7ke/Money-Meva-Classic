@@ -5,6 +5,7 @@ import { AuditLog } from '@/types';
 import { auditService } from '@/modules/transactions/services/audit';
 import { formatDate } from '@/utils';
 import { Home, Search, Filter, Trash2, Download } from 'lucide-react';
+import Link from 'next/link';
 import { useConfirm } from '@/components/ConfirmDialog';
 
 export default function AuditPage() {
@@ -68,20 +69,22 @@ export default function AuditPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Audit Log</h1>
-            <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>Track all changes and actions</p>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="p-3 rounded-xl hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <Home className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Audit Log</h1>
+              <p className="text-base mt-1" style={{ color: 'var(--text-secondary)' }}>Track all changes and actions</p>
+            </div>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => window.location.href = '/'} className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
-              <Home className="w-5 h-5" /> Home
-            </button>
-            <button onClick={exportLogs} className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
+            <button onClick={exportLogs} className="flex items-center gap-2 px-4 py-3 border rounded-xl hover:opacity-80" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
               <Download className="w-5 h-5" /> Export
             </button>
-            <button onClick={() => setShowClear(true)} className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: '#ef4444', color: '#ef4444', backgroundColor: 'var(--bg-card)' }}>
+            <button onClick={() => setShowClear(true)} className="flex items-center gap-2 px-4 py-3 border rounded-xl hover:opacity-80" style={{ borderColor: '#ef4444', color: '#ef4444', backgroundColor: 'var(--bg-card)' }}>
               <Trash2 className="w-5 h-5" /> Clear
             </button>
           </div>

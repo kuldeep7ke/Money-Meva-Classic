@@ -205,15 +205,15 @@ export default function DangerZonePage() {
   ];
 
   return (
-    <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: 'var(--bg-primary)' }}>
+    <div className="min-h-screen p-4 sm:px-6 md:px-8 py-6" style={{ backgroundColor: 'var(--bg-primary)' }}>
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex items-center gap-3">
-          <Link href="/settings" className="p-2 rounded-lg hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-            <ArrowLeft className="w-4 h-4" style={{ color: 'var(--text-primary)' }} />
+        <div className="flex items-center gap-4">
+          <Link href="/settings" className="p-3 rounded-xl hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+            <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: '#ef4444' }}>Danger Zone</h1>
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Irreversible actions. Admin access required.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#ef4444' }}>Danger Zone</h1>
+            <p className="text-base" style={{ color: 'var(--text-muted)' }}>Irreversible actions. Admin access required.</p>
           </div>
         </div>
 

@@ -101,15 +101,15 @@ export default function FinancialYearPage() {
   const maxAbs = Math.max(...data.map((d) => Math.max(Math.abs(d.income), Math.abs(d.expense), Math.abs(d.net))), 1);
 
   return (
-    <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: 'var(--bg-primary)' }}>
+    <div className="min-h-screen p-4 sm:px-6 md:px-8 py-6" style={{ backgroundColor: 'var(--bg-primary)' }}>
       <div className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center gap-3">
-          <Link href="/reports" className="p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-            <ArrowLeft className="w-4 h-4" style={{ color: 'var(--text-primary)' }} />
+        <div className="flex items-center gap-4">
+          <Link href="/reports" className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+            <ArrowLeft className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
           </Link>
           <div>
-            <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Financial Year</h1>
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Apr {fyStartYear} — Mar {fyStartYear + 1}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Financial Year</h1>
+            <p className="text-base" style={{ color: 'var(--text-muted)' }}>Apr {fyStartYear} — Mar {fyStartYear + 1}</p>
           </div>
         </div>
 

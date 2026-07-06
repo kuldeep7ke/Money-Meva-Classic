@@ -5,7 +5,7 @@ import { storage, validateBackup, type BackupData, type ImportResults } from '@/
 import { auditService } from '@/modules/transactions/services/audit';
 import { APP_VERSION } from '@/constants';
 import Link from 'next/link';
-import { Download, Upload, AlertTriangle, CheckCircle, Database, FileJson, Clock, Tag, X, Cloud, Globe, Send, ExternalLink } from 'lucide-react';
+import { Download, Upload, AlertTriangle, CheckCircle, Database, FileJson, Clock, Tag, X, Cloud, Globe, Send, ExternalLink, Home } from 'lucide-react';
 import { useConfirm } from '@/components/ConfirmDialog';
 
 type SelectedFile = {
@@ -109,15 +109,17 @@ export default function BackupPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Backup & Restore</h1>
-            <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>Export or import your data</p>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="p-3 rounded-xl hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <Home className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Backup & Restore</h1>
+              <p className="text-base mt-1" style={{ color: 'var(--text-secondary)' }}>Export or import your data</p>
+            </div>
           </div>
-          <Link href="/" className="px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}>
-            Home
-          </Link>
         </div>
 
         {importResult && (

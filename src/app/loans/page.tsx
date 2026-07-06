@@ -5,6 +5,7 @@ import { Loan, LoanType, LOAN_TYPES, LoanStats } from '@/modules/loans/types';
 import { loanService } from '@/modules/loans/services/storage';
 import { formatCurrency } from '@/utils';
 import { Home, Plus, Edit, Trash2, CheckCircle, X, CreditCard, TrendingUp, Wallet, PiggyBank, Banknote } from 'lucide-react';
+import Link from 'next/link';
 import { useConfirm } from '@/components/ConfirmDialog';
 
 export default function LoansPage() {
@@ -87,17 +88,19 @@ export default function LoansPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Loans & Investments</h1>
-            <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>Track loans, EMIs, investments and savings</p>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="p-3 rounded-xl hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <Home className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Loans & Investments</h1>
+              <p className="text-base mt-1" style={{ color: 'var(--text-secondary)' }}>Track loans, EMIs, investments and savings</p>
+            </div>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => window.location.href = '/'} className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
-              <Home className="w-5 h-5" /> Home
-            </button>
-            <button onClick={() => { resetForm(); setShowForm(true); }} className="flex items-center gap-2 px-4 py-2 text-white rounded-lg hover:opacity-90" style={{ backgroundColor: 'var(--brand)' }}>
+            <button onClick={() => { resetForm(); setShowForm(true); }} className="flex items-center gap-2 px-5 py-3 text-white rounded-xl hover:opacity-90" style={{ backgroundColor: 'var(--brand)' }}>
               <Plus className="w-5 h-5" /> Add Loan
             </button>
           </div>

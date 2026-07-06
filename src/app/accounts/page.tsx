@@ -91,20 +91,25 @@ export default function AccountsPage() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: 'var(--bg-primary)' }}>
+    <div className="min-h-screen p-4 sm:px-6 md:px-8 py-6" style={{ backgroundColor: 'var(--bg-primary)' }}>
       {PinModal}
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Accounts</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Manage your money accounts and track balances</p>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="p-3 rounded-xl hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <Home className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Accounts</h1>
+              <p className="text-base mt-1" style={{ color: 'var(--text-muted)' }}>Manage your money accounts and track balances</p>
+            </div>
           </div>
           <button
             onClick={() => { resetForm(); setShowForm(true); }}
-            className="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium"
+            className="flex items-center gap-2 px-5 py-3 text-white rounded-xl text-base font-bold"
             style={{ backgroundColor: 'var(--brand)' }}
           >
-            <Plus className="w-4 h-4" /> Add Account
+            <Plus className="w-5 h-5" /> Add Account
           </button>
         </div>
 

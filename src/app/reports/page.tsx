@@ -86,27 +86,29 @@ export default function ReportsPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Reports</h1>
-            <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>Financial insights and analytics</p>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="p-3 rounded-xl hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <Home className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Reports</h1>
+              <p className="text-base mt-1" style={{ color: 'var(--text-secondary)' }}>Financial insights and analytics</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/reports/financial-year" className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: '#6366f1', color: '#6366f1', backgroundColor: '#6366f108' }}>
+            <Link href="/reports/financial-year" className="flex items-center gap-2 px-4 py-3 border rounded-xl hover:opacity-80" style={{ borderColor: '#6366f1', color: '#6366f1', backgroundColor: '#6366f108' }}>
               <CalendarRange className="w-5 h-5" /> Financial Year
             </Link>
-            <Link href="/" className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80" style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}>
-              <Home className="w-5 h-5" /> Home
-            </Link>
             <div className="relative group">
-              <button className="flex items-center gap-2 px-4 py-2 text-white rounded-lg hover:opacity-90" style={{ backgroundColor: 'var(--brand)' }}>
+              <button className="flex items-center gap-2 px-5 py-3 text-white rounded-xl hover:opacity-90" style={{ backgroundColor: 'var(--brand)' }}>
                 <Download className="w-5 h-5" /> Export
               </button>
-              <div className="absolute right-0 top-full mt-1 border rounded-lg shadow-lg z-10 min-w-[120px] hidden group-hover:block" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
-                <button onClick={() => handleExport('csv')} className="w-full px-4 py-2 text-left hover:opacity-80" style={{ color: 'var(--text-primary)' }}>CSV</button>
-                <button onClick={() => handleExport('excel')} className="w-full px-4 py-2 text-left hover:opacity-80" style={{ color: 'var(--text-primary)' }}>Excel</button>
-                <button onClick={() => handleExport('pdf')} className="w-full px-4 py-2 text-left hover:opacity-80" style={{ color: 'var(--text-primary)' }}>PDF</button>
+              <div className="absolute right-0 top-full mt-1 border rounded-xl shadow-lg z-10 min-w-[140px] hidden group-hover:block" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                <button onClick={() => handleExport('csv')} className="w-full px-4 py-3 text-left text-base hover:opacity-80" style={{ color: 'var(--text-primary)' }}>CSV</button>
+                <button onClick={() => handleExport('excel')} className="w-full px-4 py-3 text-left text-base hover:opacity-80" style={{ color: 'var(--text-primary)' }}>Excel</button>
+                <button onClick={() => handleExport('pdf')} className="w-full px-4 py-3 text-left text-base hover:opacity-80" style={{ color: 'var(--text-primary)' }}>PDF</button>
               </div>
             </div>
           </div>

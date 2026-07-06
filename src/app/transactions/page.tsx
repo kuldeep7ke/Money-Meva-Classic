@@ -7,6 +7,7 @@ import { TransactionList } from '@/modules/transactions/components/TransactionLi
 import { TransactionFilters } from '@/modules/transactions/components/TransactionFilters';
 import { TransactionForm } from '@/modules/transactions/components/TransactionForm';
 import { formatCurrency } from '@/utils';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Plus, TrendingUp, TrendingDown, Wallet, ArrowRightLeft, Home, RefreshCw, Archive } from 'lucide-react';
 import { usePinGuard } from '@/components/PinGuard';
@@ -52,24 +53,22 @@ function TransactionsContent() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
       {PinModal}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Transactions</h1>
-            <p className="mt-1" style={{ color: 'var(--text-secondary)' }}>Manage your financial transactions</p>
+          <div className="flex items-center gap-4">
+            <Link href="/" className="p-3 rounded-xl hover:opacity-80" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <Home className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>Transactions</h1>
+              <p className="text-base mt-1" style={{ color: 'var(--text-secondary)' }}>Manage your financial transactions</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push('/')}
-              className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80"
-              style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)', backgroundColor: 'var(--bg-card)' }}
-            >
-              <Home className="w-5 h-5" /> Home
-            </button>
             {hasArchived && (
               <button
                 onClick={() => router.push('/archive')}
-                className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:opacity-80"
+                className="flex items-center gap-2 px-4 py-2 border rounded-xl hover:opacity-80"
                 style={{ borderColor: '#f97316', color: '#f97316', backgroundColor: '#f9731608' }}
               >
                 <Archive className="w-5 h-5" /> Archive
@@ -77,7 +76,7 @@ function TransactionsContent() {
             )}
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 px-4 py-2 text-white rounded-lg hover:opacity-90"
+              className="flex items-center gap-2 px-5 py-3 text-white rounded-xl hover:opacity-90"
               style={{ backgroundColor: 'var(--brand)' }}
             >
               <Plus className="w-5 h-5" /> Add Transaction
