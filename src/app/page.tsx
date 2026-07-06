@@ -10,6 +10,7 @@ import { recurringService } from "@/modules/transactions/services/recurring";
 import { ArrowRightLeft, Users, Settings, Sun, Moon, Wallet, Shield, LogOut, Plus, Home as HomeIcon, Grid3X3, Tag, CreditCard, Archive, FileText, Bell, AlertCircle, Clock, CalendarClock, X, Download, Smartphone, Cloud } from "lucide-react";
 import { useState, useEffect, useMemo, useRef } from "react";
 import dynamic from 'next/dynamic';
+import { useScrollDirection } from '@/hooks/useScrollDirection';
 
 const DashboardWidgets = dynamic(() => import('@/modules/dashboard/components/DashboardWidgets'), { ssr: false });
 import ReminderFlow from '@/components/ReminderFlow';
@@ -21,6 +22,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+  const headerHidden = useScrollDirection();
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -92,7 +94,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      <header className="sticky top-0 z-40 px-4 py-3" style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)' }}>
+      <header className="sticky top-0 z-40 px-4 py-3 transition-transform duration-300" style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', transform: headerHidden ? 'translateY(-100%)' : 'translateY(0)' }}>
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--brand)' }}>

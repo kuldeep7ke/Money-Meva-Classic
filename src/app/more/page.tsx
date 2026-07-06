@@ -19,10 +19,12 @@ import {
       PieChart, Activity, Clock, AlertTriangle, User as UserIcon
 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
+import { useScrollDirection } from '@/hooks/useScrollDirection';
 
 export default function MorePage() {
   const { hasPermission } = useAuth();
   const { requestPin, PinModal } = usePinGuard();
+  const headerHidden = useScrollDirection();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
@@ -98,7 +100,7 @@ export default function MorePage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-      <header className="sticky top-0 z-40 px-4 py-3" style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)' }}>
+      <header className="sticky top-0 z-40 px-4 py-3 transition-transform duration-300" style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-color)', transform: headerHidden ? 'translateY(-100%)' : 'translateY(0)' }}>
         <div className="max-w-5xl mx-auto flex items-center gap-3">
           <Link href="/" className="p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
             <ArrowLeft className="w-4 h-4" style={{ color: 'var(--text-primary)' }} />
